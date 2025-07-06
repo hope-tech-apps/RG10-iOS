@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct RG10App: App {
+    @StateObject private var appCoordinator = AppCoordinator()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appCoordinator)
         }
     }
 }

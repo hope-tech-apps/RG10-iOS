@@ -7,18 +7,30 @@
 
 import SwiftUI
 
+// MARK: - Main App View with Navigation
 struct ContentView: View {
+    @EnvironmentObject var coordinator: AppCoordinator
+    @StateObject private var homeViewModel = HomeViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Initial Commit")
+        ZStack {
+            switch coordinator.currentScreen {
+            case .loading:
+                LoadingScreen()
+                    .transition(.opacity)
+            case .welcome:
+                WelcomeScreen()
+                    .transition(.opacity)
+            case .home:
+                HomeScreen(viewModel: homeViewModel)
+                    .transition(.opacity)
+            }
         }
-        .padding()
+        .animation(.easeInOut(duration: 0.5), value: coordinator.currentScreen)
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(AppCoordinator())
 }
