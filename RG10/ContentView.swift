@@ -11,6 +11,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var coordinator: AppCoordinator
     @StateObject private var homeViewModel = HomeViewModel()
+    @StateObject private var authViewModel = AuthViewModel()
     
     var body: some View {
         ZStack {
@@ -24,9 +25,14 @@ struct ContentView: View {
             case .home:
                 HomeScreen(viewModel: homeViewModel)
                     .transition(.opacity)
+            case .login, .signUp:
+                EmptyView() // Handled by sheet
             }
         }
         .animation(.easeInOut(duration: 0.5), value: coordinator.currentScreen)
+        .sheet(isPresented: $coordinator.showLoginSheet) {
+            LoginView(viewModel: authViewModel)
+        }
     }
 }
 

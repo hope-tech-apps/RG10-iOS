@@ -17,9 +17,7 @@ struct MenuRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
-                Image(systemName: icon)
-                    .font(.system(size: 20))
-                    .foregroundColor(isDisabled ? .gray.opacity(0.5) : iconColor)
+                IconView(iconName: icon, size: 20, color: isDisabled ? .gray.opacity(0.5) : iconColor)
                     .frame(width: 24)
                 
                 Text(title)
@@ -29,9 +27,7 @@ struct MenuRow: View {
                 Spacer()
                 
                 if !isDisabled && title == LocalizedStrings.signInMenuItem {
-                    Image(systemName: Icons.chevronRight)
-                        .font(.system(size: 14))
-                        .foregroundColor(.gray)
+                    IconView(iconName: Icons.chevronRight, size: 14, color: .gray)
                 }
             }
             .padding(.horizontal, 24)

@@ -56,26 +56,18 @@ struct CarouselView<ViewModel: HomeViewModelProtocol>: View {
             
             // Navigation Arrows
             HStack {
-                Button(action: { viewModel.previousCarouselItem() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.title2)
-                        .foregroundColor(.black)
-                        .frame(width: 44, height: 44)
-                        .background(Color.white)
-                        .clipShape(Circle())
-                }
+                navigationButton(
+                    icon: Icons.chevronLeft,
+                    action: { viewModel.previousCarouselItem()
+                    })
                 .padding(.leading, 16)
                 
                 Spacer()
                 
-                Button(action: { viewModel.nextCarouselItem() }) {
-                    Image(systemName: "chevron.right")
-                        .font(.title2)
-                        .foregroundColor(.black)
-                        .frame(width: 44, height: 44)
-                        .background(Color.white)
-                        .clipShape(Circle())
-                }
+                navigationButton(
+                    icon: Icons.chevronRight,
+                    action: { viewModel.nextCarouselItem()
+                    })
                 .padding(.trailing, 16)
             }
             
@@ -91,6 +83,17 @@ struct CarouselView<ViewModel: HomeViewModelProtocol>: View {
                 }
                 .padding(.bottom, 16)
             }
+        }
+    }
+}
+
+extension CarouselView {
+    func navigationButton(icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            IconView(iconName: icon, size: 20, color: .black)
+                .frame(width: 44, height: 44)
+                .background(Color.white)
+                .clipShape(Circle())
         }
     }
 }

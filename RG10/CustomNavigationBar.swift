@@ -13,9 +13,7 @@ struct CustomNavigationBar: View {
     var body: some View {
         HStack {
             Button(action: { showMenu.toggle() }) {
-                Image(systemName: Icons.hamburgerMenu)
-                    .font(.title2)
-                    .foregroundColor(.black)
+                IconView(iconName: Icons.hamburgerMenu, size: 24, color: .black)
             }
             .accessibilityIdentifier(AccessibilityIdentifiers.menuButton)
             
@@ -37,4 +35,3 @@ struct CustomNavigationBar: View {
         .background(Color.white)
     }
 }
-

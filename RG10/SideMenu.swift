@@ -12,6 +12,8 @@ struct SideMenu: View {
     @Binding var isShowing: Bool
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @ObservedObject var authManager = AuthManager.shared
+    @EnvironmentObject var coordinator: AppCoordinator
     
     #if DEBUG
     @State private var showDevelopmentInfo = false
@@ -38,17 +40,13 @@ struct SideMenu: View {
                         
                         #if DEBUG
                         Button(action: { showDevelopmentInfo.toggle() }) {
-                            Image(systemName: Icons.hammer)
-                                .font(.system(size: 16))
-                                .foregroundColor(.gray)
+                            IconView(iconName: Icons.hammer, size: 16, color: .gray)
                         }
                         .padding(.trailing, 8)
                         #endif
                         
                         Button(action: { isShowing = false }) {
-                            Image(systemName: Icons.xmark)
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.gray)
+                            IconView(iconName: Icons.xmark, size: 16, color: .gray)
                         }
                     }
                     .padding(.horizontal, 24)
@@ -58,9 +56,7 @@ struct SideMenu: View {
                     // Alert Banner
                     if showAlert {
                         HStack(spacing: 12) {
-                            Image(systemName: Icons.exclamationMark)
-                                .font(.system(size: 16))
-                                .foregroundColor(AppConstants.Colors.primaryRed)
+                            IconView(iconName: Icons.exclamationMark, size: 16, color: AppConstants.Colors.primaryRed)
                             
                             Text(alertMessage)
                                 .font(.system(size: 14))
@@ -78,39 +74,72 @@ struct SideMenu: View {
                     
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
+                            // Auth Menu Items
+                            if authManager.isAuthenticated {
+                                // User info
+                                if let user = authManager.currentUser {
+                                    HStack(spacing: 16) {
+                                        IconView(iconName: Icons.account, size: 24, color: AppConstants.Colors.primaryRed)
+                                        
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(user.displayName ?? user.username)
+                                                .font(.system(size: 16, weight: .semibold))
+                                                .foregroundColor(.black)
+                                            Text(user.email)
+                                                .font(.system(size: 14))
+                                                .foregroundColor(.gray)
+                                        }
+                                        
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 16)
+                                    
+                                    Divider()
+                                        .padding(.horizontal, 24)
+                                        .padding(.bottom, 16)
+                                }
+                                
+                                // Logout
+                                MenuRow(title: "Sign Out", icon: Icons.signOut, iconColor: AppConstants.Colors.primaryRed) {
+                                    authManager.logout()
+                                    isShowing = false
+                                }
+                            } else {
+                                // Sign In / Create Account
+                                MenuRow(title: LocalizedStrings.signInMenuItem, icon: Icons.signIn, iconColor: AppConstants.Colors.primaryRed) {
+                                    isShowing = false
+                                    coordinator.showLogin()
+                                }
+                                
+                                MenuRow(title: LocalizedStrings.createAccountMenuItem, icon: Icons.createAccount) {
+                                    isShowing = false
+                                    coordinator.showLogin()
+                                }
+                            }
+                            
+                            Divider()
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 16)
+                            
                             // Main Menu Items
-                            MenuRow(title: LocalizedStrings.signInMenuItem, icon: Icons.signIn, iconColor: AppConstants.Colors.primaryRed) {
-                                // Handle sign in
-                                isShowing = false
-                            }
-                            
-                            MenuRow(title: LocalizedStrings.createAccountMenuItem, icon: Icons.createAccount) {
-                                // Handle create account
-                                isShowing = false
-                            }
-                            
                             MenuRow(title: LocalizedStrings.exploreTrainingsMenuItem, icon: Icons.exploreTrainings) {
-                                // Handle explore trainings
                                 isShowing = false
                             }
                             
                             MenuRow(title: LocalizedStrings.watchVideosMenuItem, icon: Icons.watchVideos) {
-                                // Handle watch videos
                                 isShowing = false
                             }
                             
                             MenuRow(title: LocalizedStrings.ourCoachesMenuItem, icon: Icons.ourCoaches) {
-                                // Handle our coaches
                                 isShowing = false
                             }
                             
                             MenuRow(title: LocalizedStrings.playerSpotlightsMenuItem, icon: Icons.playerSpotlights) {
-                                // Handle player spotlights
                                 isShowing = false
                             }
                             
                             MenuRow(title: LocalizedStrings.merchStoreMenuItem, icon: Icons.merchStore) {
-                                // Handle merch store
                                 isShowing = false
                             }
                             
@@ -118,28 +147,43 @@ struct SideMenu: View {
                                 .padding(.horizontal, 24)
                                 .padding(.vertical, 16)
                             
-                            // User Actions (Disabled until signed in)
-                            MenuRow(title: LocalizedStrings.bookSessionMenuItem, icon: Icons.bookSession, isDisabled: true) {
-                                alertMessage = LocalizedStrings.signInRequiredAlert
-                                showAlert = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                    showAlert = false
+                            // User Actions
+                            MenuRow(title: LocalizedStrings.bookSessionMenuItem, icon: Icons.bookSession, isDisabled: !authManager.isAuthenticated) {
+                                if authManager.isAuthenticated {
+                                    isShowing = false
+                                    // Navigate to book session
+                                } else {
+                                    alertMessage = LocalizedStrings.signInRequiredAlert
+                                    showAlert = true
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                        showAlert = false
+                                    }
                                 }
                             }
                             
-                            MenuRow(title: LocalizedStrings.myAppointmentsMenuItem, icon: Icons.myAppointments, isDisabled: true) {
-                                alertMessage = LocalizedStrings.signInRequiredAlert
-                                showAlert = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                    showAlert = false
+                            MenuRow(title: LocalizedStrings.myAppointmentsMenuItem, icon: Icons.myAppointments, isDisabled: !authManager.isAuthenticated) {
+                                if authManager.isAuthenticated {
+                                    isShowing = false
+                                    // Navigate to appointments
+                                } else {
+                                    alertMessage = LocalizedStrings.signInRequiredAlert
+                                    showAlert = true
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                        showAlert = false
+                                    }
                                 }
                             }
                             
-                            MenuRow(title: LocalizedStrings.myPlansMenuItem, icon: Icons.myPlans, isDisabled: true) {
-                                alertMessage = LocalizedStrings.signInRequiredAlert
-                                showAlert = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                    showAlert = false
+                            MenuRow(title: LocalizedStrings.myPlansMenuItem, icon: Icons.myPlans, isDisabled: !authManager.isAuthenticated) {
+                                if authManager.isAuthenticated {
+                                    isShowing = false
+                                    // Navigate to plans
+                                } else {
+                                    alertMessage = LocalizedStrings.signInRequiredAlert
+                                    showAlert = true
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                        showAlert = false
+                                    }
                                 }
                             }
                             
@@ -149,17 +193,14 @@ struct SideMenu: View {
                             
                             // Footer Items
                             MenuRow(title: LocalizedStrings.aboutRG10MenuItem, icon: Icons.aboutRG10) {
-                                // Handle about
                                 isShowing = false
                             }
                             
                             MenuRow(title: LocalizedStrings.termsOfServiceMenuItem, icon: Icons.termsOfService) {
-                                // Handle terms
                                 isShowing = false
                             }
                             
                             MenuRow(title: LocalizedStrings.privacyPolicyMenuItem, icon: Icons.privacyPolicy) {
-                                // Handle privacy
                                 isShowing = false
                             }
                         }
@@ -183,42 +224,18 @@ struct SideMenu: View {
                             .foregroundColor(.white)
                         Spacer()
                         Button(action: { showDevelopmentInfo = false }) {
-                            Image(systemName: Icons.xmarkCircleFill)
-                                .foregroundColor(.white.opacity(0.8))
+                            IconView(iconName: Icons.xmarkCircleFill, size: 20, color: .white.opacity(0.8))
                         }
                     }
                     
-                    Text("The notification appears when the user clicks on a closed section before logging in/registering.")
+                    Text("Auth Status: \(authManager.isAuthenticated ? "Authenticated" : "Not Authenticated")")
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.9))
                     
-                    HStack(spacing: 16) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Corner radius")
-                                .font(.system(size: 11))
-                                .foregroundColor(.white.opacity(0.7))
-                            Text("10px")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.white)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Component")
-                                .font(.system(size: 11))
-                                .foregroundColor(.white.opacity(0.7))
-                            Text("Unclearred: 0.97...")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.white)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Status")
-                                .font(.system(size: 11))
-                                .foregroundColor(.white.opacity(0.7))
-                            Text("Status=Error, Component=Alert")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.white)
-                        }
+                    if let user = authManager.currentUser {
+                        Text("User: \(user.username)")
+                            .font(.system(size: 12))
+                            .foregroundColor(.white.opacity(0.9))
                     }
                 }
                 .padding(16)

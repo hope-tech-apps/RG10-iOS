@@ -27,10 +27,19 @@ enum TabItem: CaseIterable {
     var icon: String {
         switch self {
         case .home: return Icons.home
-        case .training: return Icons.training
+        case .training: return Icons.fire
         case .book: return Icons.book
-        case .explore: return Icons.explore
+        case .explore: return Icons.compass
         case .account: return Icons.account
+        }
+    }
+    
+    // Get available tabs based on authentication status
+    static func availableTabs(isAuthenticated: Bool) -> [TabItem] {
+        if isAuthenticated {
+            return [.home, .training, .book, .explore]
+        } else {
+            return TabItem.allCases
         }
     }
 }

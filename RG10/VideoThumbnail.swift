@@ -16,9 +16,7 @@ struct VideoThumbnail: View {
                 .fill(video.backgroundColor)
                 .frame(width: 240, height: 160)
             
-            Image(systemName: "play.fill")
-                .font(.system(size: 40))
-                .foregroundColor(.white)
+            IconView(iconName: Icons.play, size: 40, color: .white)
         }
     }
 }
