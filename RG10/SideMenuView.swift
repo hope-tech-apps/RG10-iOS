@@ -1,5 +1,5 @@
 //
-//  SideMenu.swift
+//  SideMenuView.swift
 //  RG10
 //
 //  Created by Moneeb Sayed on 7/4/25.
@@ -8,7 +8,7 @@
 import SwiftUI
 
 // MARK: - Side Menu
-struct SideMenu: View {
+struct SideMenuView: View {
     @Binding var isShowing: Bool
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -101,18 +101,18 @@ struct SideMenu: View {
                                 }
                                 
                                 // Logout
-                                MenuRow(title: "Sign Out", icon: Icons.signOut, iconColor: AppConstants.Colors.primaryRed) {
+                                MenuRowView(title: "Sign Out", icon: Icons.signOut, iconColor: AppConstants.Colors.primaryRed) {
                                     authManager.logout()
                                     isShowing = false
                                 }
                             } else {
                                 // Sign In / Create Account
-                                MenuRow(title: LocalizedStrings.signInMenuItem, icon: Icons.signIn, iconColor: AppConstants.Colors.primaryRed) {
+                                MenuRowView(title: LocalizedStrings.signInMenuItem, icon: Icons.signIn, iconColor: AppConstants.Colors.primaryRed) {
                                     isShowing = false
                                     coordinator.showLogin()
                                 }
                                 
-                                MenuRow(title: LocalizedStrings.createAccountMenuItem, icon: Icons.createAccount) {
+                                MenuRowView(title: LocalizedStrings.createAccountMenuItem, icon: Icons.createAccount) {
                                     isShowing = false
                                     coordinator.showLogin()
                                 }
@@ -123,23 +123,23 @@ struct SideMenu: View {
                                 .padding(.vertical, 16)
                             
                             // Main Menu Items
-                            MenuRow(title: LocalizedStrings.exploreTrainingsMenuItem, icon: Icons.exploreTrainings) {
+                            MenuRowView(title: LocalizedStrings.exploreTrainingsMenuItem, icon: Icons.exploreTrainings) {
                                 isShowing = false
                             }
                             
-                            MenuRow(title: LocalizedStrings.watchVideosMenuItem, icon: Icons.watchVideos) {
+                            MenuRowView(title: LocalizedStrings.watchVideosMenuItem, icon: Icons.watchVideos) {
                                 isShowing = false
                             }
                             
-                            MenuRow(title: LocalizedStrings.ourCoachesMenuItem, icon: Icons.ourCoaches) {
+                            MenuRowView(title: LocalizedStrings.ourCoachesMenuItem, icon: Icons.ourCoaches) {
                                 isShowing = false
                             }
                             
-                            MenuRow(title: LocalizedStrings.playerSpotlightsMenuItem, icon: Icons.playerSpotlights) {
+                            MenuRowView(title: LocalizedStrings.playerSpotlightsMenuItem, icon: Icons.playerSpotlights) {
                                 isShowing = false
                             }
                             
-                            MenuRow(title: LocalizedStrings.merchStoreMenuItem, icon: Icons.merchStore) {
+                            MenuRowView(title: LocalizedStrings.merchStoreMenuItem, icon: Icons.merchStore) {
                                 isShowing = false
                             }
                             
@@ -148,7 +148,7 @@ struct SideMenu: View {
                                 .padding(.vertical, 16)
                             
                             // User Actions
-                            MenuRow(title: LocalizedStrings.bookSessionMenuItem, icon: Icons.bookSession, isDisabled: !authManager.isAuthenticated) {
+                            MenuRowView(title: LocalizedStrings.bookSessionMenuItem, icon: Icons.bookSession, isDisabled: !authManager.isAuthenticated) {
                                 if authManager.isAuthenticated {
                                     isShowing = false
                                     // Navigate to book session
@@ -161,7 +161,7 @@ struct SideMenu: View {
                                 }
                             }
                             
-                            MenuRow(title: LocalizedStrings.myAppointmentsMenuItem, icon: Icons.myAppointments, isDisabled: !authManager.isAuthenticated) {
+                            MenuRowView(title: LocalizedStrings.myAppointmentsMenuItem, icon: Icons.myAppointments, isDisabled: !authManager.isAuthenticated) {
                                 if authManager.isAuthenticated {
                                     isShowing = false
                                     // Navigate to appointments
@@ -174,7 +174,7 @@ struct SideMenu: View {
                                 }
                             }
                             
-                            MenuRow(title: LocalizedStrings.myPlansMenuItem, icon: Icons.myPlans, isDisabled: !authManager.isAuthenticated) {
+                            MenuRowView(title: LocalizedStrings.myPlansMenuItem, icon: Icons.myPlans, isDisabled: !authManager.isAuthenticated) {
                                 if authManager.isAuthenticated {
                                     isShowing = false
                                     // Navigate to plans
@@ -192,15 +192,15 @@ struct SideMenu: View {
                                 .padding(.vertical, 16)
                             
                             // Footer Items
-                            MenuRow(title: LocalizedStrings.aboutRG10MenuItem, icon: Icons.aboutRG10) {
+                            MenuRowView(title: LocalizedStrings.aboutRG10MenuItem, icon: Icons.aboutRG10) {
                                 isShowing = false
                             }
                             
-                            MenuRow(title: LocalizedStrings.termsOfServiceMenuItem, icon: Icons.termsOfService) {
+                            MenuRowView(title: LocalizedStrings.termsOfServiceMenuItem, icon: Icons.termsOfService) {
                                 isShowing = false
                             }
                             
-                            MenuRow(title: LocalizedStrings.privacyPolicyMenuItem, icon: Icons.privacyPolicy) {
+                            MenuRowView(title: LocalizedStrings.privacyPolicyMenuItem, icon: Icons.privacyPolicy) {
                                 isShowing = false
                             }
                         }

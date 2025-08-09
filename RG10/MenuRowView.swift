@@ -1,5 +1,5 @@
 //
-//  MenuRow.swift
+//  MenuRowView.swift
 //  RG10
 //
 //  Created by Moneeb Sayed on 7/4/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MenuRow: View {
+struct MenuRowView: View {
     let title: String
     let icon: String
     var iconColor: Color = .gray
