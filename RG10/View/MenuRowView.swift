@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// MARK: - Menu Row View
 struct MenuRowView: View {
     let title: String
     let icon: String
@@ -17,7 +18,9 @@ struct MenuRowView: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
-                IconView(iconName: icon, size: 20, color: isDisabled ? .gray.opacity(0.5) : iconColor)
+                Image(icon: icon)
+                    .renderingMode(.template)
+                    .iconStyle(size: 20, color: isDisabled ? .gray.opacity(0.5) : iconColor)
                     .frame(width: 24)
                 
                 Text(title)
@@ -27,7 +30,9 @@ struct MenuRowView: View {
                 Spacer()
                 
                 if !isDisabled && title == LocalizedStrings.signInMenuItem {
-                    IconView(iconName: Icons.chevronRight, size: 14, color: .gray)
+                    Image(Icons.chevronRight)
+                        .renderingMode(.template)
+                        .iconStyle(size: 14, color: .gray)
                 }
             }
             .padding(.horizontal, 24)
@@ -36,3 +41,4 @@ struct MenuRowView: View {
         .disabled(isDisabled)
     }
 }
+

@@ -21,7 +21,7 @@ struct StaffMember: Identifiable {
 
 struct StaffView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var selectedStaffIndex: Int = 0
+    @EnvironmentObject var coordinator: AppCoordinator
     
     private let staffMembers: [StaffMember] = [
         StaffMember(
@@ -54,7 +54,7 @@ struct StaffView: View {
         StaffMember(
             name: "Aryan Kamdar",
             position: "RG10 Football Coach (Chicago)",
-            mainImageURL: "https://www.rg10football.com/wp-content/uploads/2025/07/IMG_5462-scaled.jpeg",
+            mainImageURL: "https://www.rg10football.com/wp-content/uploads/2025/07/Aryan2-683x1024.jpeg",
             additionalImages: [
                 "https://www.rg10football.com/wp-content/uploads/2025/07/Aryan1-scaled.jpg"
             ],
@@ -85,17 +85,20 @@ struct StaffView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     // Hero Header
-                    StaffHeroHeader()
-                    
-                    // Staff Selector Tabs
-                    StaffSelectorTabs(
-                        staffMembers: staffMembers,
-                        selectedIndex: $selectedStaffIndex
-                    )
+                    if coordinator.selectedStaff == nil {
+                        StaffHeroHeader()
+                        // Staff Selector Tabs
+                        StaffSelectorTabs(
+                            staffMembers: staffMembers,
+                            selectedIndex: $coordinator.selectedStaff
+                        )
+                    }
                     
                     // Selected Staff Member Content
-                    if selectedStaffIndex < staffMembers.count {
-                        StaffMemberDetail(member: staffMembers[selectedStaffIndex])
+                    if coordinator.selectedStaff ?? 0 < staffMembers.count {
+                        StaffMemberDetail(
+                            member: staffMembers[coordinator.selectedStaff ?? 0]
+                        )
                     }
                 }
             }
@@ -154,11 +157,11 @@ struct StaffHeroHeader: View {
 // MARK: - Staff Selector Tabs
 struct StaffSelectorTabs: View {
     let staffMembers: [StaffMember]
-    @Binding var selectedIndex: Int
+    @Binding var selectedIndex: Int?
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 20) {
+            HStack(spacing: 16) {
                 ForEach(Array(staffMembers.enumerated()), id: \.element.id) { index, member in
                     StaffTab(
                         name: member.name,
@@ -171,11 +174,14 @@ struct StaffSelectorTabs: View {
                     }
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 20)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
-        .background(Color.white)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 5)
+        .background(
+            Rectangle()
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        )
     }
 }
 
@@ -187,24 +193,35 @@ struct StaffTab: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 Text(name)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 16, weight: isSelected ? .bold : .semibold))
                     .foregroundColor(isSelected ? AppConstants.Colors.primaryRed : .black)
                 
                 Text(position)
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(isSelected ? AppConstants.Colors.primaryRed.opacity(0.8) : .gray)
+                    .lineLimit(1)
                 
-                // Selection indicator
-                Rectangle()
+                // Selection indicator - more prominent
+                Capsule()
                     .fill(AppConstants.Colors.primaryRed)
-                    .frame(height: 3)
+                    .frame(width: isSelected ? 40 : 0, height: 3)
                     .opacity(isSelected ? 1 : 0)
-                    .padding(.top, 4)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
             }
             .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? AppConstants.Colors.primaryRed.opacity(0.08) : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? AppConstants.Colors.primaryRed.opacity(0.2) : Color.clear, lineWidth: 1)
+            )
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -217,20 +234,6 @@ struct StaffMemberDetail: View {
         VStack(spacing: 0) {
             // Main Image Section
             ZStack {
-                // Background image with blur
-                AsyncImage(url: URL(string: member.mainImageURL)) { phase in
-                    if let image = phase.image {
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 400)
-                            .blur(radius: 20)
-                            .overlay(Color.black.opacity(0.4))
-                    } else {
-                        Color.gray
-                            .frame(height: 400)
-                    }
-                }
                 
                 // Main image
                 AsyncImage(url: URL(string: member.mainImageURL)) { phase in

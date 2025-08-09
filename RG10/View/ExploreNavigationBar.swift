@@ -1,4 +1,13 @@
-// MARK: - Navigation Bar
+//
+//  ExploreNavigationBar.swift
+//  RG10
+//
+//  Created by Moneeb Sayed on 8/9/25.
+//
+
+
+import SwiftUI
+
 struct ExploreNavigationBar: View {
     @EnvironmentObject var authManager: AuthManager
     

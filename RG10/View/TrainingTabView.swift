@@ -1,3 +1,12 @@
+//
+//  TrainingTabView.swift
+//  RG10
+//
+//  Created by Moneeb Sayed on 7/31/25.
+//
+
+import SwiftUI
+
 // MARK: - Placeholder Tab Views
 struct TrainingTabView: View {
     var body: some View {

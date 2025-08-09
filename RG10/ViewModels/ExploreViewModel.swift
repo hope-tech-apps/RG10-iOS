@@ -1,3 +1,13 @@
+//
+//  ExploreViewModel.swift
+//  RG10
+//
+//  Created by Moneeb Sayed on 8/9/25.
+//
+
+import SwiftUI
+import Combine
+
 // MARK: - View Model
 class ExploreViewModel: ObservableObject {
     @Published var coaches: [Coach] = [
@@ -8,15 +18,9 @@ class ExploreViewModel: ObservableObject {
             cardImageURL: nil
         ),
         Coach(
-            name: "Rodrigo Gudino",
-            role: "Head Coach & CEO",
-            imageURL: "https://www.rg10football.com/wp-content/uploads/2025/07/DSC9911.jpeg",
-            cardImageURL: nil
-        ),
-        Coach(
             name: "Aryan Kamdar",
             role: "RG10 Coach (Chicago)",
-            imageURL: "https://www.rg10football.com/wp-content/uploads/2025/07/IMG_5462-scaled.jpeg",
+            imageURL: "https://www.rg10football.com/wp-content/uploads/2025/07/Aryan2-683x1024.jpeg",
             cardImageURL: nil
         )
     ]
@@ -46,7 +50,7 @@ class ExploreViewModel: ObservableObject {
         PlayerSpotlight(
             name: "Player's name",
             description: "A brief about. A rising star known for his unmatched speed and precision on the field. His dedication and discipline have made him a role model for aspiring players around the world.",
-            imageURL: ""
+            imageURL: "https://www.rg10football.com/wp-content/uploads/2025/07/IMG_5462-scaled.jpeg"
         ),
         PlayerSpotlight(
             name: "Another Player",

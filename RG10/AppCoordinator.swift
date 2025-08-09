@@ -19,6 +19,10 @@ class AppCoordinator: ObservableObject {
     
     @Published var currentScreen: Screen = .loading
     @Published var showLoginSheet = false
+    @Published var showStaffSheet = false
+    @Published var showAboutSheet = false
+    @Published var selectedStaff: Int? = 0
+    @Published var showExploreSheet = false
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -37,6 +41,19 @@ class AppCoordinator: ObservableObject {
     
     func showLogin() {
         showLoginSheet = true
+    }
+    
+    func showExplore() {
+        showExploreSheet = true
+    }
+    
+    func showStaff(selectedStaff: Int?) {
+        self.selectedStaff = selectedStaff
+        showStaffSheet = true
+    }
+    
+    func showAbout() {
+        showAboutSheet = true
     }
     
     func dismissLogin() {

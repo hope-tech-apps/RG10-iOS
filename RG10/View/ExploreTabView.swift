@@ -1,3 +1,10 @@
+//
+//  ExploreTabView.swift
+//  RG10
+//
+//  Created by Moneeb Sayed on 7/31/25.
+//
+
 import SwiftUI
 
 struct ExploreTabView: View {

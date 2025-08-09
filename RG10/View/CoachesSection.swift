@@ -1,3 +1,12 @@
+//
+//  CoachesSection.swift
+//  RG10
+//
+//  Created by Moneeb Sayed on 8/9/25.
+//
+
+import SwiftUI
+
 // MARK: - Coaches Section
 struct CoachesSection: View {
     let coaches: [Coach]
@@ -14,7 +23,7 @@ struct CoachesSection: View {
                 HStack(spacing: 16) {
                     ForEach(coaches) { coach in
                         CoachCard(coach: coach) {
-                            coordinator.showStaff()
+                            coordinator.showStaff(selectedStaff: coaches.firstIndex(of: coach))
                         }
                     }
                 }

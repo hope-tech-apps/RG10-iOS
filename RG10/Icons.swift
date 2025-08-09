@@ -186,6 +186,11 @@ enum Icons {
     // Development Icons (for DEBUG mode)
     static let hammer = "hammer.fill" // Keep SF Symbol as no equivalent in SVG list
     static let `case` = "Case"
+    
+    static let checkmark = "Check"
+    static let trophy = "Star" // Using Star as trophy
+    static let target = "Compass" // Using Compass as target
+    static let star = "Star"
 }
 
 // MARK: - Icon Helper Methods

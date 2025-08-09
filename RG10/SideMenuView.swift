@@ -125,22 +125,28 @@ struct SideMenuView: View {
                             // Main Menu Items
                             MenuRowView(title: LocalizedStrings.exploreTrainingsMenuItem, icon: Icons.exploreTrainings) {
                                 isShowing = false
+                                // Navigate to trainings
                             }
                             
                             MenuRowView(title: LocalizedStrings.watchVideosMenuItem, icon: Icons.watchVideos) {
                                 isShowing = false
+                                // Navigate to videos
                             }
                             
                             MenuRowView(title: LocalizedStrings.ourCoachesMenuItem, icon: Icons.ourCoaches) {
                                 isShowing = false
+                                coordinator
+                                    .showExplore()
                             }
                             
                             MenuRowView(title: LocalizedStrings.playerSpotlightsMenuItem, icon: Icons.playerSpotlights) {
                                 isShowing = false
+                                // Navigate to player spotlights
                             }
                             
                             MenuRowView(title: LocalizedStrings.merchStoreMenuItem, icon: Icons.merchStore) {
                                 isShowing = false
+                                // Navigate to merch store
                             }
                             
                             Divider()
@@ -194,14 +200,17 @@ struct SideMenuView: View {
                             // Footer Items
                             MenuRowView(title: LocalizedStrings.aboutRG10MenuItem, icon: Icons.aboutRG10) {
                                 isShowing = false
+                                coordinator.showAbout() // Navigate to AboutView
                             }
                             
                             MenuRowView(title: LocalizedStrings.termsOfServiceMenuItem, icon: Icons.termsOfService) {
                                 isShowing = false
+                                // Navigate to terms
                             }
                             
                             MenuRowView(title: LocalizedStrings.privacyPolicyMenuItem, icon: Icons.privacyPolicy) {
                                 isShowing = false
+                                // Navigate to privacy
                             }
                         }
                     }
@@ -250,3 +259,4 @@ struct SideMenuView: View {
         .animation(.easeInOut(duration: 0.3), value: isShowing)
     }
 }
+
