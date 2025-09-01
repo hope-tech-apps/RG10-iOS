@@ -21,9 +21,22 @@
 		A9A815412E182EBC000ABC76 /* RG10Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RG10Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A9E049DF2E65404700388A92 /* Exceptions for "RG10" folder in "RG10" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A9A815332E182EBA000ABC76 /* RG10 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A9A815362E182EBA000ABC76 /* RG10 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A9E049DF2E65404700388A92 /* Exceptions for "RG10" folder in "RG10" target */,
+			);
 			path = RG10;
 			sourceTree = "<group>";
 		};
@@ -332,6 +345,7 @@
 				DEVELOPMENT_TEAM = 2UC73TESRT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RG10/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -366,6 +380,7 @@
 				DEVELOPMENT_TEAM = 2UC73TESRT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RG10/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

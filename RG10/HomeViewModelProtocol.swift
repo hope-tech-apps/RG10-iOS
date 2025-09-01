@@ -9,7 +9,7 @@ import Foundation
 
 protocol HomeViewModelProtocol: ObservableObject {
     var carouselItems: [CarouselItem] { get }
-    var videos: [VideoItem] { get }
+    var videos: [YouTubeVideo] { get }
     var currentCarouselIndex: Int { get set }
     var selectedTab: TabItem { get set }
     

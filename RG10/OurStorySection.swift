@@ -7,8 +7,9 @@
 
 import SwiftUI
 
+// MARK: - Updated Our Story Section
 struct OurStorySection: View {
-    let videos: [VideoItem]
+    let videos: [YouTubeVideo]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -19,7 +20,7 @@ struct OurStorySection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(videos) { video in
-                        VideoThumbnail(video: video)
+                        YouTubeVideoCard(video: video)
                     }
                 }
             }

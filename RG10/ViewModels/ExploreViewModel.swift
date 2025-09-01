@@ -10,6 +10,7 @@ import Combine
 
 // MARK: - View Model
 class ExploreViewModel: ObservableObject {
+    var cancellables = Set<AnyCancellable>()
     @Published var coaches: [Coach] = [
         Coach(
             name: "Rodrigo Gudino",
@@ -25,27 +26,8 @@ class ExploreViewModel: ObservableObject {
         )
     ]
     
-    @Published var recommendedVideos: [ExploreVideoItem] = [
-        ExploreVideoItem(
-            title: "Video title in brief",
-            thumbnailURL: "",
-            duration: "0:5M",
-            views: nil
-        ),
-        ExploreVideoItem(
-            title: "Video title in brief",
-            thumbnailURL: "",
-            duration: "1:5M",
-            views: nil
-        ),
-        ExploreVideoItem(
-            title: "Training Session Highlights",
-            thumbnailURL: "",
-            duration: "2:30M",
-            views: nil
-        )
-    ]
-    
+    @Published var recommendedVideos: [ExploreVideoItem] = []
+
     @Published var playerSpotlights: [PlayerSpotlight] = [
         PlayerSpotlight(
             name: "Player's name",
@@ -63,4 +45,26 @@ class ExploreViewModel: ObservableObject {
             imageURL: ""
         )
     ]
+    
+    init() {
+        loadYouTubePlaylist()
+    }
+    
+    func loadYouTubePlaylist() {
+        YouTubeService.shared.fetchPlaylistVideos(playlistId: "PLPzb8bYVQEQEEH4q36QMcB5JzBRKBblVA")
+        
+        YouTubeService.shared.$playlistVideos
+            .sink { [weak self] videos in
+                self?.recommendedVideos = videos.map { video in
+                    ExploreVideoItem(
+                        title: video.title,
+                        thumbnailURL: video.thumbnailURL,
+                        duration: video.duration,
+                        views: nil,
+                        videoID: video.videoID
+                    )
+                }
+            }
+            .store(in: &cancellables)
+    }
 }

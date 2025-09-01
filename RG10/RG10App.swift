@@ -17,6 +17,7 @@ struct RG10App: App {
             ContentView()
                 .environmentObject(appCoordinator)
                 .environmentObject(authManager)
+                .preferredColorScheme(.light)
         }
     }
 }

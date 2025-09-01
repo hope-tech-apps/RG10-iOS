@@ -23,7 +23,8 @@ struct CoachesSection: View {
                 HStack(spacing: 16) {
                     ForEach(coaches) { coach in
                         CoachCard(coach: coach) {
-                            coordinator.showStaff(selectedStaff: coaches.firstIndex(of: coach))
+                            let index = coaches.firstIndex(where: { $0.id == coach.id })
+                            coordinator.showStaff(selectedStaff: index)
                         }
                     }
                 }

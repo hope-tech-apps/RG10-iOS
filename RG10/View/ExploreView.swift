@@ -6,11 +6,10 @@
 //  Explore tab with coaches, videos, and player spotlights
 //
 
-
 import SwiftUI
 
 // MARK: - Models
-struct Coach: Identifiable, Equatable {
+struct Coach: Identifiable {
     let id = UUID()
     let name: String
     let role: String
@@ -22,8 +21,9 @@ struct ExploreVideoItem: Identifiable {
     let id = UUID()
     let title: String
     let thumbnailURL: String
-    let duration: String
+    let duration: String?
     let views: String?
+    let videoID: String? // Add video ID for playback
 }
 
 struct PlayerSpotlight: Identifiable {
@@ -43,9 +43,9 @@ struct ExploreView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 0) {
-//                    // Custom Navigation Bar
-//                    ExploreNavigationBar()
-//                    
+                    // Custom Navigation Bar
+                    ExploreNavigationBar()
+                    
                     // Meet the Coaches Section
                     CoachesSection(coaches: viewModel.coaches)
                         .padding(.top, 20)
@@ -63,12 +63,22 @@ struct ExploreView: View {
                         selectedIndex: $selectedSpotlightIndex
                     )
                     .padding(.top, 32)
+                    
+                    // Bottom padding for tab bar
+                    Color.clear.frame(height: 100)
                 }
             }
             .navigationBarHidden(true)
             .background(Color.white)
         }
     }
+}
+
+// MARK: - Preview
+#Preview {
+    ExploreView()
+        .environmentObject(AppCoordinator())
+        .environmentObject(AuthManager.shared)
 }
 
 // MARK: - Corner Radius Extension

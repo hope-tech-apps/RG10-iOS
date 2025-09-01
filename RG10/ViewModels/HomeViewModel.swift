@@ -11,7 +11,20 @@ import Combine
 
 class HomeViewModel: HomeViewModelProtocol {
     @Published var carouselItems: [CarouselItem] = TestDataFactory.makeCarouselItems()
-    @Published var videos: [VideoItem] = TestDataFactory.makeVideoItems()
+    @Published var videos: [YouTubeVideo] = [
+        YouTubeVideo(
+            title: "RG10 Football - Our Journey",
+            url: "https://youtu.be/TlQ8bLELCu8"
+        ),
+        YouTubeVideo(
+            title: "Training Excellence",
+            url: "https://youtu.be/j4kj-Yrl_uU"
+        ),
+        YouTubeVideo(
+            title: "Building Champions",
+            url: "https://youtu.be/WBqLygBUPKY"
+        )
+    ]
     
     @Published var currentCarouselIndex: Int = 0
     @Published var selectedTab: TabItem = .home
