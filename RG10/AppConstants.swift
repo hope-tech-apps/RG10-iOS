@@ -19,6 +19,8 @@ enum AppConstants {
         static let logoColor = "rg10-color"
         static let logoWhite = "rg10-white"
         static let soccerBackground = "soccer_background"
+        static let campOne = "camp_1"
+        static let trainingFooter = "trainingFooter"
         static let videoThumbnail1 = "video_thumbnail_1"
         static let videoThumbnail2 = "video_thumbnail_2"
     }
