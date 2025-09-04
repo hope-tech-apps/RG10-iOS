@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 
+@MainActor
 // MARK: - View Model
 class ExploreViewModel: ObservableObject {
     var cancellables = Set<AnyCancellable>()
@@ -51,20 +52,25 @@ class ExploreViewModel: ObservableObject {
     }
     
     func loadYouTubePlaylist() {
-        YouTubeService.shared.fetchPlaylistVideos(playlistId: "PLPzb8bYVQEQEEH4q36QMcB5JzBRKBblVA")
-        
-        YouTubeService.shared.$playlistVideos
-            .sink { [weak self] videos in
-                self?.recommendedVideos = videos.map { video in
-                    ExploreVideoItem(
-                        title: video.title,
-                        thumbnailURL: video.thumbnailURL,
-                        duration: video.duration,
-                        views: nil,
-                        videoID: video.videoID
-                    )
+        Task {
+            await YouTubeService.shared
+                .fetchPlaylistVideos(
+                    playlistId: "PLPzb8bYVQEQEEH4q36QMcB5JzBRKBblVA"
+                )
+            
+            YouTubeService.shared.$playlistVideos
+                .sink { [weak self] videos in
+                    self?.recommendedVideos = videos.map { video in
+                        ExploreVideoItem(
+                            title: video.title,
+                            thumbnailURL: video.thumbnailURL,
+                            duration: video.duration,
+                            views: nil,
+                            videoID: video.videoID
+                        )
+                    }
                 }
-            }
-            .store(in: &cancellables)
+                .store(in: &cancellables)
+        }
     }
 }

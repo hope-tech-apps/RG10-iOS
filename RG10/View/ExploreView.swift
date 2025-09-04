@@ -43,9 +43,6 @@ struct ExploreView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 0) {
-                    // Custom Navigation Bar
-                    ExploreNavigationBar()
-                    
                     // Meet the Coaches Section
                     CoachesSection(coaches: viewModel.coaches)
                         .padding(.top, 20)
