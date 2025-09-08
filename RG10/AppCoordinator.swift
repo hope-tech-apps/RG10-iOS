@@ -23,6 +23,7 @@ class AppCoordinator: ObservableObject {
     @Published var showAboutSheet = false
     @Published var selectedStaff: Int? = 0
     @Published var showExploreSheet = false
+    @Published var showMerchSheet = false
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -54,6 +55,10 @@ class AppCoordinator: ObservableObject {
     
     func showAbout() {
         showAboutSheet = true
+    }
+    
+    func showMerch() {
+        showMerchSheet = true
     }
     
     func dismissLogin() {

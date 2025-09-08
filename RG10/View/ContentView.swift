@@ -36,6 +36,9 @@ struct ContentView: View {
         .sheet(isPresented: $coordinator.showAboutSheet) {
             AboutView()
         }
+        .sheet(isPresented: $coordinator.showMerchSheet) {
+            SupabaseMerchandiseView()
+        }
         .sheet(isPresented: $coordinator.showExploreSheet) {
             ExploreView()
                 .environmentObject(coordinator)

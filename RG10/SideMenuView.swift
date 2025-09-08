@@ -147,6 +147,7 @@ struct SideMenuView: View {
                             MenuRowView(title: LocalizedStrings.merchStoreMenuItem, icon: Icons.merchStore) {
                                 isShowing = false
                                 // Navigate to merch store
+                                coordinator.showMerch()
                             }
                             
                             Divider()
