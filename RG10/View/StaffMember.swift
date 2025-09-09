@@ -5,6 +5,9 @@
 //  Staff page with professional design matching RG10 brand
 //
 
+
+import SwiftUI
+
 import SwiftUI
 
 struct StaffMember: Identifiable {
@@ -20,9 +23,7 @@ struct StaffMember: Identifiable {
 }
 
 struct StaffView: View {
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var coordinator: AppCoordinator
-    
+    var selectedIndex: Int? = nil // Pass this as parameter instead of using coordinator
     private let staffMembers: [StaffMember] = [
         StaffMember(
             name: "Rodrigo Gudino",
@@ -80,30 +81,37 @@ struct StaffView: View {
         )
     ]
     
+    @State private var currentSelectedIndex: Int? = nil
+    
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Hero Header
-                    if coordinator.selectedStaff == nil {
-                        StaffHeroHeader()
-                        // Staff Selector Tabs
-                        StaffSelectorTabs(
-                            staffMembers: staffMembers,
-                            selectedIndex: $coordinator.selectedStaff
-                        )
-                    }
-                    
-                    // Selected Staff Member Content
-                    if coordinator.selectedStaff ?? 0 < staffMembers.count {
+        ScrollView {
+            VStack(spacing: 0) {
+                // Hero Header - show only if no initial selection
+                if selectedIndex == nil && currentSelectedIndex == nil {
+                    StaffHeroHeader()
+                    // Staff Selector Tabs
+                    StaffSelectorTabs(
+                        staffMembers: staffMembers,
+                        selectedIndex: $currentSelectedIndex
+                    )
+                } else {
+                    // Direct to staff member if navigated from coaches
+                    let index = selectedIndex ?? currentSelectedIndex ?? 0
+                    if index < staffMembers.count {
                         StaffMemberDetail(
-                            member: staffMembers[coordinator.selectedStaff ?? 0]
+                            member: staffMembers[index]
                         )
                     }
                 }
             }
-            .ignoresSafeArea(edges: .top)
-            .navigationBarHidden(true)
+        }
+        .navigationTitle("Our Coaches")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // Set initial selection if provided
+            if let index = selectedIndex {
+                currentSelectedIndex = index
+            }
         }
     }
 }

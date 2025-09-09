@@ -53,36 +53,35 @@ struct ExploreView: View {
     @StateObject private var viewModel = ExploreViewModel()
     @State private var selectedVideoIndex = 0
     @State private var selectedSpotlightIndex = 0
+    @EnvironmentObject var navigationManager: NavigationManager
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Meet the Coaches Section
-                    CoachesSection(coaches: viewModel.coaches)
-                        .padding(.top, 20)
-                    
-                    // Recommended Videos Section
-                    RecommendedVideosSection(
-                        videos: viewModel.recommendedVideos,
-                        selectedIndex: $selectedVideoIndex
-                    )
-                    .padding(.top, 32)
-                    
-                    // Player Spotlights Section
-                    PlayerSpotlightsSection(
-                        spotlights: viewModel.playerSpotlights,
-                        selectedIndex: $selectedSpotlightIndex
-                    )
-                    .padding(.top, 32)
-                    
-                    // Bottom padding for tab bar
-                    Color.clear.frame(height: 100)
-                }
+        ScrollView {
+            VStack(spacing: 0) {
+                // Meet the Coaches Section
+                CoachesSection(coaches: viewModel.coaches)
+                    .padding(.top, 20)
+                
+                // Recommended Videos Section
+                RecommendedVideosSection(
+                    videos: viewModel.recommendedVideos,
+                    selectedIndex: $selectedVideoIndex
+                )
+                .padding(.top, 32)
+                
+                // Player Spotlights Section
+                PlayerSpotlightsSection(
+                    spotlights: viewModel.playerSpotlights,
+                    selectedIndex: $selectedSpotlightIndex
+                )
+                .padding(.top, 32)
+                
+                // Bottom padding for tab bar
+                Color.clear.frame(height: 100)
             }
-            .navigationBarHidden(true)
-            .background(Color.white)
         }
+        .background(Color.white)
+        .navigationBarHidden(true) // Hide the default nav bar since we have custom one
     }
 }
 

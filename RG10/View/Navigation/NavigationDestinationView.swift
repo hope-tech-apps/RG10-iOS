@@ -13,60 +13,58 @@ struct NavigationDestinationView: View {
     @EnvironmentObject var coordinator: AppCoordinator
     
     var body: some View {
-        switch destination {
-        // Auth destinations
-        case .login:
-            LoginView(viewModel: AuthViewModel())
-        case .signUp:
-            SignUpView(viewModel: AuthViewModel())
-        case .forgotPassword:
-            ForgotPasswordView()
-            
-        // Main Content destinations
-        case .about:
-            AboutView()
-        case .staff(let selectedIndex):
-            StaffView()
-                .environmentObject(coordinator)
-                .onAppear {
-                    coordinator.selectedStaff = selectedIndex
-                }
-        case .merchandise:
-            SupabaseMerchandiseView()
-        case .merchandiseDetail(let product):
-            SupabaseProductDetailView(product: product)
-        case .termsOfService:
-            TermsOfServiceView()
-        case .privacyPolicy:
-            PrivacyPolicyView()
-            
-        // Training destinations
-        case .trainingPackages:
-            TrainingPackagesView()
-        case .campDetail(let camp):
-            CampDetailView(camp: camp)
-        case .workoutDetail(let workoutId):
-            WorkoutDetailView(workoutId: workoutId)
-            
-        // Explore destinations
-        case .coachProfile(let coach):
-            CoachDetailView(coach: coach)
-        case .videoPlayer(let video):
-            VideoPlayerDetailView(video: video)
-        case .playerSpotlight(let spotlight):
-            PlayerSpotlightDetailView(spotlight: spotlight)
-            
-        // Account destinations
-        case .editProfile:
-            EditProfileView()
-        case .myAppointments:
-            MyAppointmentsView()
-        case .paymentHistory:
-            PaymentHistoryView()
-        case .settings:
-            SettingsView()
-        case .support:
-            SupportView()
+        Group {
+            switch destination {
+            case .login:
+                LoginView(viewModel: AuthViewModel())
+            case .signUp:
+                SignUpView(viewModel: AuthViewModel())
+            case .forgotPassword:
+                ForgotPasswordView()
+            case .about:
+                AboutView()
+            case .staff(let selectedIndex):
+                StaffView(selectedIndex: selectedIndex)
+            case .merchandise:
+                SupabaseMerchandiseView()
+            case .merchandiseDetail(let product):
+                SupabaseProductDetailView(product: product)
+            case .termsOfService:
+                TermsOfServiceView()
+            case .privacyPolicy:
+                PrivacyPolicyView()
+                
+                // Training destinations
+            case .trainingPackages:
+                TrainingPackagesView()
+            case .campDetail(let camp):
+                CampDetailView(camp: camp)
+            case .workoutDetail(let workoutId):
+                WorkoutDetailView(workoutId: workoutId)
+                
+                // Explore destinations
+            case .coachProfile(let coach):
+                CoachDetailView(coach: coach)
+            case .videoPlayer(let video):
+                VideoPlayerDetailView(video: video)
+            case .playerSpotlight(let spotlight):
+                PlayerSpotlightDetailView(spotlight: spotlight)
+                
+                // Account destinations
+            case .editProfile:
+                EditProfileView()
+            case .myAppointments:
+                MyAppointmentsView()
+            case .paymentHistory:
+                PaymentHistoryView()
+            case .settings:
+                SettingsView()
+            case .support:
+                SupportView()
+            }
         }
+        .toolbar(.hidden, for: .tabBar) // Add this line to hide tab bar
+
     }
+    
 }

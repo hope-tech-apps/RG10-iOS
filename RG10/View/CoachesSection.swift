@@ -7,10 +7,9 @@
 
 import SwiftUI
 
-// MARK: - Coaches Section
 struct CoachesSection: View {
     let coaches: [Coach]
-    @EnvironmentObject var coordinator: AppCoordinator
+    @EnvironmentObject var navigationManager: NavigationManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -21,10 +20,10 @@ struct CoachesSection: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    ForEach(coaches) { coach in
+                    ForEach(Array(coaches.enumerated()), id: \.element.id) { index, coach in
                         CoachCard(coach: coach) {
-                            let index = coaches.firstIndex(where: { $0.id == coach.id })
-                            coordinator.showStaff(selectedStaff: index)
+                            // Navigate to staff view with selected index
+                            navigationManager.navigate(to: .staff(selectedIndex: index), in: .explore)
                         }
                     }
                 }
