@@ -16,4 +16,5 @@ protocol HomeViewModelProtocol: ObservableObject {
     func nextCarouselItem()
     func previousCarouselItem()
     func bookNow()
+    func filterCarouselItems(isAuthenticated: Bool) // Add this
 }

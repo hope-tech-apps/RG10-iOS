@@ -9,6 +9,8 @@ import SwiftUI
 
 struct CarouselView<ViewModel: HomeViewModelProtocol>: View {
     @ObservedObject var viewModel: ViewModel
+    @EnvironmentObject var navigationManager: NavigationManager
+    @ObservedObject var authManager = AuthManager.shared
     
     var body: some View {
         ZStack {
@@ -41,13 +43,13 @@ struct CarouselView<ViewModel: HomeViewModelProtocol>: View {
                     .padding(.horizontal, 40)
                     .padding(.top, 8)
                 
-                Button(action: { viewModel.bookNow() }) {
+                Button(action: { handleButtonAction() }) {
                     Text(viewModel.carouselItems[viewModel.currentCarouselIndex].buttonTitle)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 32)
                         .padding(.vertical, 12)
-                        .background(Color(red: 204/255, green: 51/255, blue: 51/255))
+                        .background(AppConstants.Colors.primaryRed)
                         .cornerRadius(25)
                 }
                 .padding(.top, 20)
@@ -58,16 +60,16 @@ struct CarouselView<ViewModel: HomeViewModelProtocol>: View {
             HStack {
                 navigationButton(
                     icon: Icons.chevronLeft,
-                    action: { viewModel.previousCarouselItem()
-                    })
+                    action: { viewModel.previousCarouselItem() }
+                )
                 .padding(.leading, 16)
                 
                 Spacer()
                 
                 navigationButton(
                     icon: Icons.chevronRight,
-                    action: { viewModel.nextCarouselItem()
-                    })
+                    action: { viewModel.nextCarouselItem() }
+                )
                 .padding(.trailing, 16)
             }
             
@@ -83,6 +85,27 @@ struct CarouselView<ViewModel: HomeViewModelProtocol>: View {
                 }
                 .padding(.bottom, 16)
             }
+        }
+        .onAppear {
+            viewModel.filterCarouselItems(isAuthenticated: authManager.isAuthenticated)
+        }
+        .onChange(of: authManager.isAuthenticated) { isAuthenticated in
+            viewModel.filterCarouselItems(isAuthenticated: isAuthenticated)
+        }
+    }
+    
+    private func handleButtonAction() {
+        let currentItem = viewModel.carouselItems[viewModel.currentCarouselIndex]
+        
+        switch currentItem.buttonAction {
+        case .bookNow:
+            navigationManager.selectedTab = .book
+        case .learnMore:
+            navigationManager.selectedTab = .training
+        case .applyNow:
+            navigationManager.selectedTab = .account
+        case .custom(let action):
+            action()
         }
     }
 }

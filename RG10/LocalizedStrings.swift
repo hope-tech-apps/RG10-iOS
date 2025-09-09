@@ -11,6 +11,7 @@ enum LocalizedStrings {
     // Screen Titles
     static let welcomeTitle = "Welcome to!"
     static let ourStoryTitle = "Our story in brief"
+    static let ourTeamTitle = "Our team"
     
     // Carousel Items
     static let carouselTitle1 = "RG10 FOOTBALL"

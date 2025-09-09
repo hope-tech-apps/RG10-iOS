@@ -9,24 +9,30 @@ import SwiftUI
 
 enum TestDataFactory {
     static func makeCarouselItems() -> [CarouselItem] {
-        [
+        return [
             CarouselItem(
-                title: LocalizedStrings.carouselTitle1,
-                subtitle: LocalizedStrings.carouselSubtitle1,
-                imageName: AppConstants.Images.soccerBackground,
-                buttonTitle: LocalizedStrings.carouselButton1
+                imageName: "carousel_training",
+                title: "RG10 FOOTBALL",
+                subtitle: "Unleash Your Full Potential on the Field, and off the Field",
+                buttonTitle: "Book Now",
+                buttonAction: .bookNow,
+                requiresAuth: false
             ),
             CarouselItem(
-                title: LocalizedStrings.carouselTitle2,
-                subtitle: LocalizedStrings.carouselSubtitle2,
-                imageName: AppConstants.Images.soccerBackground,
-                buttonTitle: LocalizedStrings.carouselButton2
+                imageName: "carousel_excellence",
+                title: "Training Excellence",
+                subtitle: "Professional coaching to elevate your game",
+                buttonTitle: "Learn More",
+                buttonAction: .learnMore,
+                requiresAuth: false
             ),
             CarouselItem(
-                title: LocalizedStrings.carouselTitle3,
-                subtitle: LocalizedStrings.carouselSubtitle3,
-                imageName: AppConstants.Images.soccerBackground,
-                buttonTitle: LocalizedStrings.carouselButton3
+                imageName: "carousel_join",
+                title: "Join RG10 Family",
+                subtitle: "Start your journey with us today",
+                buttonTitle: "Apply Now",
+                buttonAction: .applyNow,
+                requiresAuth: false
             )
         ]
     }

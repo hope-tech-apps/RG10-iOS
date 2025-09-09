@@ -9,28 +9,43 @@
 import SwiftUI
 
 // MARK: - Models
-struct Coach: Identifiable {
+struct Coach: Identifiable, Hashable {
     let id = UUID()
     let name: String
     let role: String
     let imageURL: String
-    let cardImageURL: String? // Optional different image for card display
+    let cardImageURL: String?
+    
+    // Hashable conformance
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
-struct ExploreVideoItem: Identifiable {
+struct ExploreVideoItem: Identifiable, Hashable {
     let id = UUID()
     let title: String
     let thumbnailURL: String
     let duration: String?
     let views: String?
-    let videoID: String? // Add video ID for playback
+    let videoID: String?
+    
+    // Hashable conformance
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
-struct PlayerSpotlight: Identifiable {
+struct PlayerSpotlight: Identifiable, Hashable {
     let id = UUID()
     let name: String
     let description: String
     let imageURL: String
+    
+    // Hashable conformance
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 // MARK: - Main Explore View

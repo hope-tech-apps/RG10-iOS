@@ -176,11 +176,15 @@ class TrainingPackagesViewModel: ObservableObject {
     }
 }
 
-// MARK: - Data Models
-struct CampData: Identifiable {
+struct CampData: Identifiable, Hashable {
     let id = UUID()
     let image: String
     let title: String
     let dates: String
     let hasCheckmark: Bool
+    
+    // Hashable conformance
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }

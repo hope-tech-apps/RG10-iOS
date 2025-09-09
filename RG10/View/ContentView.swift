@@ -7,50 +7,31 @@
 
 import SwiftUI
 
-// MARK: - Main App View with Navigation
-struct ContentView: View {
-    @EnvironmentObject var coordinator: AppCoordinator
-    @StateObject private var homeViewModel = HomeViewModel()
-    @StateObject private var authViewModel = AuthViewModel()
-    @StateObject private var exploreViewModel = ExploreViewModel()
-    var body: some View {
-        ZStack {
-            switch coordinator.currentScreen {
-            case .loading:
-                LoadingScreen()
-                    .transition(.opacity)
-            case .welcome:
-                WelcomeScreen()
-                    .transition(.opacity)
-            case .home:
-                HomeView(viewModel: homeViewModel)
-                    .transition(.opacity)
-            case .login, .signUp:
-                EmptyView() // Handled by sheet
-            }
-        }
-        .animation(.easeInOut(duration: 0.5), value: coordinator.currentScreen)
-        .sheet(isPresented: $coordinator.showLoginSheet) {
-            LoginView(viewModel: authViewModel)
-        }
-        .sheet(isPresented: $coordinator.showAboutSheet) {
-            AboutView()
-        }
-        .sheet(isPresented: $coordinator.showMerchSheet) {
-            SupabaseMerchandiseView()
-        }
-        .sheet(isPresented: $coordinator.showExploreSheet) {
-            ExploreView()
-                .environmentObject(coordinator)
-        }
-        .sheet(isPresented: $coordinator.showStaffSheet) {
-            StaffView()
-                .environmentObject(coordinator)
-        }
-    }
-}
+//
+//  ContentView.swift
+//  RG10
+//
+//  Main app with notification handling
+//
 
-#Preview {
-    ContentView()
-        .environmentObject(AppCoordinator())
+import SwiftUI
+
+struct ContentView: View {
+    @StateObject private var navigationManager = NavigationManager.shared
+    @StateObject private var authManager = AuthManager.shared
+    @State private var showLoginSheet = false
+    
+    var body: some View {
+        MainTabView()
+            .environmentObject(navigationManager)
+            .environmentObject(authManager)
+            .onReceive(NotificationCenter.default.publisher(for: .showLogin)) { _ in
+                if !authManager.isAuthenticated {
+                    showLoginSheet = true
+                }
+            }
+            .sheet(isPresented: $showLoginSheet) {
+                LoginView(viewModel: AuthViewModel())
+            }
+    }
 }

@@ -5,20 +5,12 @@
 //  Created by Moneeb Sayed on 9/6/25.
 //
 
-//
-//  SupabaseMerchandiseViews.swift
-//  RG10
-//
-//  Updated merchandise views for Supabase integration
-//
-
 import SwiftUI
 
 // MARK: - Main Merchandise View
 struct SupabaseMerchandiseView: View {
     @StateObject private var viewModel = SupabaseMerchandiseViewModel()
-    @State private var selectedProduct: DBProduct?
-    @State private var showingProductDetail = false
+    @State private var navigationPath = NavigationPath()
     
     private let columns = [
         GridItem(.flexible()),
@@ -26,7 +18,7 @@ struct SupabaseMerchandiseView: View {
     ]
     
     var body: some View {
-        NavigationView {
+        NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
                 // Search Bar
                 HStack {
@@ -54,47 +46,6 @@ struct SupabaseMerchandiseView: View {
                 .cornerRadius(10)
                 .padding(.horizontal)
                 .padding(.vertical, 8)
-                
-                // Category Filter
-//                ScrollView(.horizontal, showsIndicators: false) {
-//                    HStack(spacing: 12) {
-//                        // All Products button
-//                        Button(action: {
-//                            viewModel.selectCategory(nil)
-//                        }) {
-//                            Text("All")
-//                                .font(.system(size: 14, weight: .medium))
-//                                .foregroundColor(viewModel.selectedCategory == nil ? .white : .black)
-//                                .padding(.horizontal, 16)
-//                                .padding(.vertical, 8)
-//                                .background(
-//                                    viewModel.selectedCategory == nil ?
-//                                    AppConstants.Colors.primaryRed : Color(UIColor.systemGray5)
-//                                )
-//                                .cornerRadius(20)
-//                        }
-//                        
-//                        // Category buttons
-//                        ForEach(viewModel.categories, id: \.id) { category in
-//                            Button(action: {
-//                                viewModel.selectCategory(category)
-//                            }) {
-//                                Text(category.category.capitalized)
-//                                    .font(.system(size: 14, weight: .medium))
-//                                    .foregroundColor(viewModel.selectedCategory?.id == category.id ? .white : .black)
-//                                    .padding(.horizontal, 16)
-//                                    .padding(.vertical, 8)
-//                                    .background(
-//                                        viewModel.selectedCategory?.id == category.id ?
-//                                        AppConstants.Colors.primaryRed : Color(UIColor.systemGray5)
-//                                    )
-//                                    .cornerRadius(20)
-//                            }
-//                        }
-//                    }
-//                    .padding(.horizontal)
-//                    .padding(.vertical, 8)
-//                }
                 
                 // Products Grid
                 if viewModel.isLoading {
@@ -145,11 +96,10 @@ struct SupabaseMerchandiseView: View {
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 16) {
                             ForEach(viewModel.filteredProducts, id: \.id) { product in
-                                SupabaseProductCard(product: product)
-                                    .onTapGesture {
-                                        selectedProduct = product
-                                        showingProductDetail = true
-                                    }
+                                NavigationLink(value: product) {
+                                    SupabaseProductCard(product: product)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding()
@@ -159,16 +109,14 @@ struct SupabaseMerchandiseView: View {
             }
             .navigationTitle("Merchandise")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showingProductDetail) {
-                if let product = selectedProduct {
-                    SupabaseProductDetailView(product: product)
-                }
+            .navigationDestination(for: DBProduct.self) { product in
+                SupabaseProductDetailView(product: product)
             }
         }
     }
 }
 
-// MARK: - Product Card
+// MARK: - Product Card (Keep the same)
 struct SupabaseProductCard: View {
     let product: DBProduct
     
@@ -240,7 +188,6 @@ struct SupabaseProductCard: View {
                     .foregroundColor(.gray)
                     .lineLimit(1)
                 
-                // Price will be shown in detail view since it varies by size
                 Text("View Options")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppConstants.Colors.primaryRed)
@@ -254,219 +201,187 @@ struct SupabaseProductCard: View {
     }
 }
 
-// MARK: - Product Detail View
+// MARK: - Simple Product Detail View
 struct SupabaseProductDetailView: View {
+    let product: DBProduct
     @StateObject private var viewModel: SupabaseProductDetailViewModel
-    @Environment(\.dismiss) var dismiss
-    @State private var showingCheckout = false
+    @State private var showingStripeError = false
     
     init(product: DBProduct) {
-        _viewModel = StateObject(wrappedValue: SupabaseProductDetailViewModel(product: product))
+        self.product = product
+        self._viewModel = StateObject(wrappedValue: SupabaseProductDetailViewModel(product: product))
     }
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Image Gallery
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // Image Gallery
+                if !product.imageArray.isEmpty {
                     TabView {
-                        ForEach(viewModel.product.imageArray.isEmpty ? [""] : viewModel.product.imageArray, id: \.self) { imageURL in
-                            if !imageURL.isEmpty, let url = URL(string: imageURL) {
+                        ForEach(product.imageArray, id: \.self) { imageURL in
+                            if let url = URL(string: imageURL) {
                                 AsyncImage(url: url) { image in
                                     image
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
                                 } placeholder: {
-                                    Rectangle()
-                                        .fill(Color.gray.opacity(0.1))
-                                        .overlay(ProgressView())
+                                    ProgressView()
+                                        .frame(maxWidth: .infinity, minHeight: 400)
                                 }
-                            } else {
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.1))
-                                    .overlay(
-                                        Image(systemName: "photo")
-                                            .font(.system(size: 60))
-                                            .foregroundColor(.gray.opacity(0.5))
-                                    )
                             }
                         }
                     }
                     .tabViewStyle(PageTabViewStyle())
                     .frame(height: 400)
+                }
+                
+                VStack(alignment: .leading, spacing: 16) {
+                    // Product Info
+                    HStack {
+                        Text(product.name)
+                            .font(.system(size: 24, weight: .bold))
+                        
+                        Spacer()
+                        
+                        if product.is_new {
+                            Label("NEW", systemImage: "sparkle")
+                                .font(.caption.bold())
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.green)
+                                .cornerRadius(6)
+                        }
+                    }
                     
-                    VStack(alignment: .leading, spacing: 16) {
-                        // Product Info
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Spacer()
-                                
-                                if viewModel.product.is_new {
-                                    Text("NEW")
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(Color.green)
-                                        .cornerRadius(4)
-                                }
-                                
-                                if viewModel.product.is_featured {
-                                    Text("FEATURED")
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(AppConstants.Colors.primaryRed)
-                                        .cornerRadius(4)
-                                }
-                            }
-                            
-                            Text(viewModel.product.name)
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.black)
-                            
-                            Text(viewModel.product.description)
-                                .font(.system(size: 16))
-                                .foregroundColor(.black.opacity(0.8))
-                        }
-                        
-                        Divider()
-                        
-                        // Size Selection
-                        if viewModel.isLoadingSizes {
-                            HStack {
-                                ProgressView()
-                                Text("Loading sizes...")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.gray)
-                            }
-                            .padding()
-                        } else if !viewModel.productSizes.isEmpty {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Select Size")
-                                    .font(.system(size: 16, weight: .semibold))
-                                
-                                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 12) {
-                                    ForEach(viewModel.productSizes, id: \.id) { size in
-                                        Button(action: {
-                                            viewModel.selectedSize = size
-                                        }) {
-                                            VStack(spacing: 4) {
-                                                Text(size.displayName)
-                                                    .font(.system(size: 14, weight: .medium))
-                                                Text(size.formattedPrice)
-                                                    .font(.system(size: 12))
-                                            }
-                                            .foregroundColor(viewModel.selectedSize?.id == size.id ? .white : .black)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 12)
-                                            .background(
-                                                viewModel.selectedSize?.id == size.id ?
-                                                AppConstants.Colors.primaryRed : Color(UIColor.systemGray5)
-                                            )
-                                            .cornerRadius(8)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Price Display
-                        if let selectedSize = viewModel.selectedSize {
-                            HStack {
-                                Text("Price:")
-                                    .font(.system(size: 18))
-                                Text(viewModel.formattedPrice)
-                                    .font(.system(size: 24, weight: .bold))
-                                    .foregroundColor(AppConstants.Colors.primaryRed)
-                            }
-                        }
-                        
-                        // Quantity Selector
+                    Text(product.description)
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                    
+                    Divider()
+                    
+                    // Size Selection
+                    if viewModel.isLoadingSizes {
                         HStack {
-                            Text("Quantity")
-                                .font(.system(size: 16, weight: .semibold))
+                            ProgressView()
+                            Text("Loading sizes...")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                    } else if !viewModel.productSizes.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Select Size")
+                                .font(.headline)
                             
-                            Spacer()
-                            
-                            HStack(spacing: 16) {
-                                Button(action: viewModel.decrementQuantity) {
-                                    Image(systemName: "minus.circle")
-                                        .font(.system(size: 24))
-                                        .foregroundColor(viewModel.quantity > 1 ? .black : .gray)
+                            ForEach(viewModel.productSizes, id: \.id) { size in
+                                HStack {
+                                    Button(action: {
+                                        viewModel.selectedSize = size
+                                    }) {
+                                        HStack {
+                                            Image(systemName: viewModel.selectedSize?.id == size.id ? "checkmark.circle.fill" : "circle")
+                                            Text(size.displayName)
+                                            Spacer()
+                                            Text(size.formattedPrice)
+                                                .fontWeight(.semibold)
+                                        }
+                                        .padding()
+                                        .background(
+                                            viewModel.selectedSize?.id == size.id ?
+                                            AppConstants.Colors.primaryRed.opacity(0.1) :
+                                            Color(UIColor.secondarySystemBackground)
+                                        )
+                                        .cornerRadius(10)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
-                                .disabled(viewModel.quantity <= 1)
-                                
-                                Text("\(viewModel.quantity)")
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .frame(width: 40)
-                                
-                                Button(action: viewModel.incrementQuantity) {
-                                    Image(systemName: "plus.circle")
-                                        .font(.system(size: 24))
-                                        .foregroundColor(viewModel.quantity < 10 ? .black : .gray)
-                                }
-                                .disabled(viewModel.quantity >= 10)
                             }
                         }
-                        
-                        // Total Price
-                        if viewModel.selectedSize != nil {
-                            HStack {
-                                Text("Total:")
-                                    .font(.system(size: 18, weight: .semibold))
-                                Spacer()
-                                Text(viewModel.formattedTotalPrice)
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(AppConstants.Colors.primaryRed)
-                            }
+                    } else {
+                        Text("No sizes available")
+                            .foregroundColor(.secondary)
                             .padding()
-                            .background(Color(UIColor.systemGray6))
-                            .cornerRadius(8)
-                        }
+                    }
+                    
+                    // Quantity
+                    HStack {
+                        Text("Quantity")
+                            .font(.headline)
                         
-                        // Checkout Button
-                        Button(action: {
-                            viewModel.openStripeCheckout()
-                        }) {
-                            HStack {
-                                Image(systemName: "creditcard")
-                                Text("Checkout with Stripe")
-                                    .font(.system(size: 18, weight: .semibold))
+                        Spacer()
+                        
+                        HStack(spacing: 20) {
+                            Button(action: viewModel.decrementQuantity) {
+                                Image(systemName: "minus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(viewModel.quantity > 1 ? AppConstants.Colors.primaryRed : .gray)
                             }
+                            .disabled(viewModel.quantity <= 1)
+                            
+                            Text("\(viewModel.quantity)")
+                                .font(.title2.bold())
+                                .frame(width: 50)
+                            
+                            Button(action: viewModel.incrementQuantity) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(viewModel.quantity < 10 ? AppConstants.Colors.primaryRed : .gray)
+                            }
+                            .disabled(viewModel.quantity >= 10)
+                        }
+                    }
+                    .padding(.vertical)
+                    
+                    // Total
+                    if viewModel.selectedSize != nil {
+                        HStack {
+                            Text("Total")
+                                .font(.title2.bold())
+                            Spacer()
+                            Text(viewModel.formattedTotalPrice)
+                                .font(.title.bold())
+                                .foregroundColor(AppConstants.Colors.primaryRed)
+                        }
+                        .padding()
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .cornerRadius(12)
+                    }
+                    
+                    // Checkout Button
+                    Button(action: {
+                        if product.stripe_payment_link != nil {
+                            viewModel.openStripeCheckout()
+                        } else {
+                            showingStripeError = true
+                        }
+                    }) {
+                        Label("Checkout with Stripe", systemImage: "creditcard.fill")
+                            .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                             .background(
                                 viewModel.canAddToCart ?
-                                AppConstants.Colors.primaryRed : Color.gray
+                                AppConstants.Colors.primaryRed :
+                                Color.gray
                             )
                             .cornerRadius(12)
-                        }
-                        .disabled(!viewModel.canAddToCart)
-                        
-                        // Error Message
-                        if let error = viewModel.errorMessage {
-                            Text(error)
-                                .font(.system(size: 14))
-                                .foregroundColor(.red)
-                                .padding()
-                                .background(Color.red.opacity(0.1))
-                                .cornerRadius(8)
-                        }
                     }
-                    .padding()
+                    .disabled(!viewModel.canAddToCart)
                 }
+                .padding()
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            Task {
+                await viewModel.loadProductSizes()
             }
+        }
+        .alert("Payment Unavailable", isPresented: $showingStripeError) {
+            Button("OK") { }
+        } message: {
+            Text("Payment link is not configured for this product.")
         }
     }
 }

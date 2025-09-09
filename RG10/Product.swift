@@ -12,7 +12,7 @@ import Combine
 
 // MARK: - Database Models (matching your Supabase schema)
 
-struct DBProduct: Codable {
+struct DBProduct: Codable, Hashable {
     let id: Int
     let name: String
     let description: String
@@ -29,6 +29,15 @@ struct DBProduct: Codable {
     var imageArray: [String] {
         return image_urls ?? []
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: DBProduct, rhs: DBProduct) -> Bool {
+        lhs.id == rhs.id
+    }
+
 }
 
 struct DBCategory: Codable {
@@ -40,13 +49,8 @@ struct DBProductSize: Codable {
     let id: Int
     let product_id: Int
     let size_id: Int
-    let size_type_id: Int?
     let price: Double
     let stripe_price_id: String?
-    
-    // Relations (will be populated with joins)
-    var size: DBSize?
-    var size_type: DBSizeType?
 }
 
 struct DBSize: Codable {
@@ -83,75 +87,61 @@ class SupabaseMerchandiseService: ObservableObject {
         return products
     }
     
-    // MARK: - Fetch Products with Category
-    func fetchProductsWithCategory() async throws -> [(product: DBProduct, category: DBCategory?)] {
-        let response = try await client
-            .from("products")
-            .select("*, categories!category_id(*)")
-            .execute()
-        
-        // Parse the joined data
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        
-        // This is a simplified version - you might need to adjust based on actual response structure
-        let products = try decoder.decode([DBProduct].self, from: response.data)
-        
-        // For now, returning products without category joins
-        // You'd need to parse the joined data properly based on Supabase response
-        return products.map { ($0, nil) }
-    }
-    
     // MARK: - Fetch Product Sizes for Specific Product
     func fetchProductSizes(for productId: Int) async throws -> [ProductSizeDetail] {
-        // Query with joins to get size and type information
-        let response = try await client
+        // First fetch product_sizes for this product
+        let productSizesResponse = try await client
             .from("product_sizes")
-            .select("*, sizes!size_id(*, size_types!size_type_id(*))")
+            .select("*")
             .eq("product_id", value: productId)
             .execute()
         
-        // Parse the response
-        let jsonObject = try JSONSerialization.jsonObject(with: response.data)
-        guard let jsonArray = jsonObject as? [[String: Any]] else {
-            throw SupabaseError.parseError
-        }
+        let productSizes = try JSONDecoder().decode([DBProductSize].self, from: productSizesResponse.data)
         
-        var productSizes: [ProductSizeDetail] = []
+        // Fetch all sizes to get size names
+        let sizesResponse = try await client
+            .from("sizes")
+            .select("*")
+            .execute()
         
-        for item in jsonArray {
-            guard let id = item["id"] as? Int,
-                  let price = item["price"] as? Double else { continue }
-            
-            // Extract size information
-            var sizeName = "Unknown"
-            var sizeTypeName: String? = nil
-            
-            if let sizeData = item["sizes"] as? [String: Any],
-               let size = sizeData["size"] as? String {
-                sizeName = size
+        let sizes = try JSONDecoder().decode([DBSize].self, from: sizesResponse.data)
+        
+        // Create a dictionary for quick lookup
+        let sizesDict = Dictionary(uniqueKeysWithValues: sizes.map { ($0.id, $0) })
+        
+        // Map to ProductSizeDetail
+        var sizeDetails: [ProductSizeDetail] = []
+        
+        for productSize in productSizes {
+            if let size = sizesDict[productSize.size_id] {
+                let sizeType = size.size_type_id == 1 ? "Youth" : "Adult"
                 
-                if let sizeTypeNameData = sizeData["size_type_id"] as? Int {
-                    sizeTypeName = sizeTypeNameData == 1 ? "Youth" : "Adult"
-                }
+                let detail = ProductSizeDetail(
+                    id: productSize.id,
+                    productId: productId,
+                    sizeName: size.size,
+                    sizeType: sizeType,
+                    price: productSize.price,
+                    stripePriceId: productSize.stripe_price_id,
+                    inStock: true
+                )
+                
+                sizeDetails.append(detail)
             }
-                        
-            let stripePriceId = item["stripe_price_id"] as? String
-            
-            let sizeDetail = ProductSizeDetail(
-                id: id,
-                productId: productId,
-                sizeName: sizeName,
-                sizeType: sizeTypeName ?? "",
-                price: price,
-                stripePriceId: stripePriceId,
-                inStock: true // You might want to add stock tracking
-            )
-            
-            productSizes.append(sizeDetail)
         }
         
-        return productSizes
+        // Sort by size_type (Youth first) then by typical size order
+        let sizeOrder = ["small", "medium", "large", "xl", "2xl"]
+        sizeDetails.sort { first, second in
+            if first.sizeType != second.sizeType {
+                return first.sizeType == "Youth"
+            }
+            let firstIndex = sizeOrder.firstIndex(of: first.sizeName.lowercased()) ?? 99
+            let secondIndex = sizeOrder.firstIndex(of: second.sizeName.lowercased()) ?? 99
+            return firstIndex < secondIndex
+        }
+        
+        return sizeDetails
     }
     
     // MARK: - Fetch Categories
@@ -177,7 +167,10 @@ struct ProductSizeDetail {
     let inStock: Bool
     
     var displayName: String {
-        return "\(sizeName.uppercased()) (\(sizeType.capitalized))"
+        if sizeType.isEmpty || sizeType == "Unknown" {
+            return sizeName.uppercased()
+        }
+        return "\(sizeName.uppercased()) (\(sizeType))"
     }
     
     var formattedPrice: String {
@@ -261,23 +254,19 @@ class SupabaseMerchandiseViewModel: ObservableObject {
     }
 }
 
-// MARK: - Product Detail ViewModel
 @MainActor
 class SupabaseProductDetailViewModel: ObservableObject {
     @Published var product: DBProduct
     @Published var productSizes: [ProductSizeDetail] = []
     @Published var selectedSize: ProductSizeDetail?
     @Published var quantity = 1
-    @Published var isLoadingSizes = false
+    @Published var isLoadingSizes = true // Start as true
     @Published var errorMessage: String?
     
     private let service = SupabaseMerchandiseService.shared
     
     init(product: DBProduct) {
         self.product = product
-        Task {
-            await loadProductSizes()
-        }
     }
     
     func loadProductSizes() async {
@@ -286,20 +275,17 @@ class SupabaseProductDetailViewModel: ObservableObject {
         
         do {
             let sizes = try await service.fetchProductSizes(for: product.id)
-            productSizes = sizes
-            
-            // Auto-select first available size
+            self.productSizes = sizes
             if let firstSize = sizes.first {
-                selectedSize = firstSize
+                self.selectedSize = firstSize
             }
         } catch {
-            errorMessage = "Failed to load sizes: \(error.localizedDescription)"
-            print("Error loading product sizes: \(error)")
+            self.errorMessage = "Failed to load sizes: \(error.localizedDescription)"
         }
         
         isLoadingSizes = false
     }
-    
+
     func incrementQuantity() {
         if quantity < 10 {
             quantity += 1
@@ -339,7 +325,6 @@ class SupabaseProductDetailViewModel: ObservableObject {
             return
         }
         
-        // You can append quantity and size parameters to the URL if needed
         UIApplication.shared.open(url)
     }
 }

@@ -16,10 +16,7 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     var body: some View {
         NavigationView {
             ZStack {
-                VStack(spacing: 0) {
-                    // Navigation Bar
-                    CustomNavigationBar(showMenu: $showMenu)
-                    
+                VStack(spacing: 0) {                    
                     // Tab Content
                     Group {
                         // Tab Content - Account tab shows inline content
@@ -46,19 +43,15 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
                             AccountTabView()  // ✅ Shows inline, not as sheet
                         }
                     }
-                    
-                    // Tab Bar
-                    CustomTabBar(selectedTab: $viewModel.selectedTab)
                 }
                 
                 // Side Menu
                 if showMenu {
-                    SideMenuView(isShowing: $showMenu)
+                    SideMenuView(isShowing: $showMenu) // Cannot find 'SideMenuView' in scope
                         .environmentObject(coordinator)
                 }
             }
         }
-        .navigationBarHidden(true)
         .onChange(of: authManager.isAuthenticated) { isAuthenticated in
             // If user logs in while on account tab, switch to home tab
             if isAuthenticated && viewModel.selectedTab == .account {
