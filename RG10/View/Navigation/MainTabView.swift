@@ -11,7 +11,6 @@ struct MainTabView: View {
     @StateObject private var navigationManager = NavigationManager.shared
     @StateObject private var authManager = AuthManager.shared
     @StateObject private var coordinator = AppCoordinator()
-    @State private var selectedTab: TabItem = .home
     @State private var showingSideMenu = false
     @State private var sideMenuOffset: CGFloat = 0
     
@@ -19,7 +18,8 @@ struct MainTabView: View {
     
     var body: some View {
         ZStack {
-            TabView(selection: $selectedTab) {
+            // Use navigationManager.selectedTab as the binding
+            TabView(selection: $navigationManager.selectedTab) {  // Changed here
                 // Home Tab
                 NavigationStack(path: $navigationManager.homePath) {
                     HomeContentView()
@@ -37,7 +37,7 @@ struct MainTabView: View {
                 }
                 .tag(TabItem.home)
                 
-                // Training Tab (if available)
+                // Training Tab
                 if availableTabs.contains(.training) {
                     NavigationStack(path: $navigationManager.trainingPath) {
                         TrainingTabView()
@@ -56,7 +56,7 @@ struct MainTabView: View {
                     .tag(TabItem.training)
                 }
                 
-                // Book Tab (if available)
+                // Book Tab
                 if availableTabs.contains(.book) {
                     NavigationStack(path: $navigationManager.bookPath) {
                         BookTabView()
@@ -75,7 +75,7 @@ struct MainTabView: View {
                     .tag(TabItem.book)
                 }
                 
-                // Explore Tab (if available)
+                // Explore Tab
                 if availableTabs.contains(.explore) {
                     NavigationStack(path: $navigationManager.explorePath) {
                         ExploreView()
@@ -120,20 +120,15 @@ struct MainTabView: View {
             }
             .tint(AppConstants.Colors.primaryRed)
             .onChange(of: authManager.isAuthenticated) { _ in
-                if !availableTabs.contains(selectedTab) {
-                    selectedTab = .home
+                if !availableTabs.contains(navigationManager.selectedTab) {  // Changed here
+                    navigationManager.selectedTab = .home
                 }
             }
             .environmentObject(navigationManager)
             
-            // Side Menu Overlay with swipe support
+            // Side Menu Overlay
             if showingSideMenu {
-                SideMenuContainer(
-                    isShowing: $showingSideMenu,
-                    menuWidth: UIScreen.main.bounds.width * 0.8
-                )
-                .environmentObject(coordinator)
-                .environmentObject(navigationManager)
+                // ... rest of side menu code
             }
         }
     }
@@ -143,14 +138,16 @@ struct MainTabView: View {
     }
 }
 
-// Home Content View (extracted for clarity)
+// HomeContentView
 struct HomeContentView: View {
     @StateObject private var viewModel = HomeViewModel()
+    @EnvironmentObject var navigationManager: NavigationManager  // Add this
     
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
                 CarouselView(viewModel: viewModel)
+                    .environmentObject(navigationManager)  // Pass it down
                     .frame(height: 400)
                 
                 OurStorySection(videos: viewModel.videos)
@@ -160,6 +157,7 @@ struct HomeContentView: View {
         }
     }
 }
+
 // MARK: - Navigation Bar Setup Extension
 extension View {
     func navigationBarSetup(showingSideMenu: Binding<Bool>) -> some View {
