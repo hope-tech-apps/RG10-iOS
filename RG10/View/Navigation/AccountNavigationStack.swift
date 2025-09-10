@@ -248,9 +248,9 @@ struct AccountMainView: View {
                     Label("My Appointments", systemImage: "calendar")
                 }
                 
-                NavigationLink(value: NavigationDestination.paymentHistory) {
-                    Label("Payment History", systemImage: "creditcard")
-                }
+//                NavigationLink(value: NavigationDestination.paymentHistory) {
+//                    Label("Payment History", systemImage: "creditcard")
+//                }
             }
             
             Section("Settings") {

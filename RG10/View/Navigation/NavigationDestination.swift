@@ -22,7 +22,10 @@ enum NavigationDestination: Hashable {
     case merchandiseDetail(DBProduct)
     case termsOfService
     case privacyPolicy
-    
+    case videoLibrary
+    case playerSpotlights
+    case myPlans
+
     // Training
     case trainingPackages
     case campDetail(CampData)

@@ -61,6 +61,12 @@ struct NavigationDestinationView: View {
                 SettingsView()
             case .support:
                 SupportView()
+            case .videoLibrary:
+                VideoLibraryView()
+            case .playerSpotlights:
+                EmptyView()
+            case .myPlans:
+                MyPlansView()
             }
         }
         .toolbar(.hidden, for: .tabBar) // Add this line to hide tab bar

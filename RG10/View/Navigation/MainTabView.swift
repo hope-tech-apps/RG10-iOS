@@ -128,12 +128,8 @@ struct MainTabView: View {
             
             // Side Menu Overlay
             if showingSideMenu {
-                SideMenuContainer(
-                    isShowing: $showingSideMenu,
-                    menuWidth: UIScreen.main.bounds.width * 0.8
-                )
-                .environmentObject(coordinator)
-                .environmentObject(navigationManager)
+                SideMenuContainer(isShowing: $showingSideMenu)
+                    .environmentObject(navigationManager)
             }
         }
     }

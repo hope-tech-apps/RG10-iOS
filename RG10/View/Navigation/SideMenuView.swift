@@ -9,190 +9,203 @@ import SwiftUI
 
 struct SideMenuView: View {
     @Binding var isShowing: Bool
-    @EnvironmentObject var coordinator: AppCoordinator
     @ObservedObject var authManager = AuthManager.shared
     @EnvironmentObject var navigationManager: NavigationManager
+    @State private var showingBookingWebView = false
 
     var body: some View {
-        ZStack {
-            // Background overlay
-            if isShowing {
-                Color.black
-                    .opacity(0.3)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation {
-                            isShowing = false
-                        }
-                    }
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            VStack(alignment: .leading, spacing: 12) {
+                Image(AppConstants.Images.logoColor)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 40)
+                
+                if authManager.isAuthenticated {
+                    Text("Hello \(authManager.currentUser?.username ?? "")!")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(AppConstants.Colors.primaryRed)
+                    Text(authManager.currentUser?.email ?? "")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                }
             }
+            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(UIColor.systemGray6))
             
-            // Side Menu
-            HStack {
+            ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    // Header
-                    VStack(alignment: .leading, spacing: 12) {
-                        Image(AppConstants.Images.logoColor)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 40)
+                    // Account Section
+                    if !authManager.isAuthenticated {
+                        Group {
+                            MenuRowView(
+                                title: "Sign In",
+                                icon: Icons.signIn,
+                                iconColor: AppConstants.Colors.primaryRed,
+                                action: {
+                                    isShowing = false
+                                    navigationManager.selectedTab = .account
+                                }
+                            )
+                            
+                            MenuRowView(
+                                title: "Create Account",
+                                icon: Icons.createAccount,
+                                action: {
+                                    isShowing = false
+                                    navigationManager.selectedTab = .account
+                                }
+                            )
+                        }
                         
-                        if authManager.isAuthenticated {
-                            Text("Welcome back!")
-                                .font(.system(size: 18, weight: .semibold))
-                            Text(authManager.currentUser?.email ?? "")
-                                .font(.system(size: 14))
-                                .foregroundColor(.gray)
-                        }
+                        SectionDivider()
                     }
-                    .padding(24)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(UIColor.systemGray6))
                     
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 4) {
-                            // Sign In / Account
-                            if !authManager.isAuthenticated {
-                                MenuRowView(
-                                    title: LocalizedStrings.signInMenuItem,
-                                    icon: Icons.account,
-                                    action: {
-                                        isShowing = false
-                                        coordinator.showLoginSheet = true
-                                    }
-                                )
-                            } else {
-                                MenuRowView(
-                                    title: "My Account",
-                                    icon: Icons.account,
-                                    action: {
-                                        isShowing = false
-                                        // Navigate to account
-                                    }
-                                )
+                    // Explore Section
+                    Group {
+                        MenuRowView(
+                            title: "Explore Trainings",
+                            icon: Icons.exploreTrainings,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .trainingPackages, in: .home)
                             }
-                            
-                            Divider()
-                                .padding(.vertical, 8)
-                            
-                            // About
-                            MenuRowView(
-                                title: LocalizedStrings.aboutRG10MenuItem,
-                                icon: Icons.infoCircle,
-                                action: {
-                                    isShowing = false
-                                    coordinator.showAboutSheet = true
-                                }
-                            )
-                            
-                            // Our Coaches
-                            MenuRowView(
-                                title: LocalizedStrings.ourTeamTitle,
-                                icon: Icons.account,
-                                action: {
-                                    isShowing = false
-                                    coordinator.showStaffSheet = true
-                                }
-                            )
-                            
-                            // Merchandise
-                            MenuRowView(
-                                title: LocalizedStrings.merchStoreMenuItem,
-                                icon: Icons.bag1,
-                                action: {
-                                    isShowing = false
-                                    coordinator.showMerchSheet = true
-                                }
-                            )
-                            
-                            Divider()
-                                .padding(.vertical, 8)
-                            
-                            // Explore
-                            MenuRowView(
-                                title: "Explore",
-                                icon: Icons.search,
-                                action: {
-                                    isShowing = false
-                                    coordinator.showExploreSheet = true
-                                }
-                            )
-                            
-                            // Training
-                            MenuRowView(
-                                title: "Training",
-                                icon: Icons.fire,
-                                isDisabled: !authManager.isAuthenticated,
-                                action: {
-                                    if authManager.isAuthenticated {
-                                        isShowing = false
-                                        // Navigate to training
-                                    }
-                                }
-                            )
-                            
-                            // Book Session
-                            MenuRowView(
-                                title: "Book Session",
-                                icon: Icons.bookSession,
-                                isDisabled: !authManager.isAuthenticated,
-                                action: {
-                                    if authManager.isAuthenticated {
-                                        isShowing = false
-                                        // Navigate to booking
-                                    }
-                                }
-                            )
-                            
-                            Divider()
-                                .padding(.vertical, 8)
-                            
-                            // Legal
-                            MenuRowView(
-                                title: "Terms of Service",
-                                icon: Icons.termsOfService,
-                                action: {
-                                    isShowing = false
-                                    navigationManager.navigate(to: .termsOfService, in: .home)
-                                }
-                            )
-                            
-                            MenuRowView(
-                                title: "Privacy Policy",
-                                icon: Icons.shield,
-                                action: {
-                                    isShowing = false
-                                    navigationManager.navigate(to: .privacyPolicy, in: .home)
-                                }
-                            )
-                            
-                            // Sign Out (if authenticated)
-                            if authManager.isAuthenticated {
-                                Divider()
-                                    .padding(.vertical, 8)
-                                
-                                MenuRowView(
-                                    title: "Sign Out",
-                                    icon: Icons.signOut,
-                                    iconColor: .red,
-                                    action: {
-                                        authManager.logout()
-                                        isShowing = false
-                                    }
-                                )
+                        )
+                        
+                        MenuRowView(
+                            title: "Watch Videos",
+                            icon: Icons.watchVideos,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .videoLibrary, in: .home)
                             }
-                        }
-                        .padding(.vertical, 16)
+                        )
+                        
+                        MenuRowView(
+                            title: "Our Coaches",
+                            icon: Icons.ourCoaches,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .staff(selectedIndex: nil), in: .home)
+                            }
+                        )
+                        
+                        MenuRowView(
+                            title: "Player Spotlights",
+                            icon: Icons.playerSpotlights,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .playerSpotlights, in: .home)
+                            }
+                        )
+                        
+                        MenuRowView(
+                            title: "Merch Store",
+                            icon: Icons.merchStore,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .merchandise, in: .home)
+                            }
+                        )
+                    }
+                    
+                    // User Section (if authenticated)
+                    if authManager.isAuthenticated {
+                        SectionDivider()
+                        
+                        MenuRowView(
+                            title: "Book a Session",
+                            icon: Icons.bookSession,
+                            action: {
+                                isShowing = false
+                                showingBookingWebView = true
+                            }
+                        )
+                        
+                        MenuRowView(
+                            title: "My Appointments",
+                            icon: Icons.myAppointments,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .myAppointments, in: .account)
+                            }
+                        )
+                        
+                        MenuRowView(
+                            title: "My Plans",
+                            icon: Icons.myPlans,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .myPlans, in: .account)
+                            }
+                        )
+                    }
+                    
+                    SectionDivider()
+                    
+                    // About Section
+                    Group {
+                        MenuRowView(
+                            title: "About RG10",
+                            icon: Icons.aboutRG10,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .about, in: .home)
+                            }
+                        )
+                        
+                        MenuRowView(
+                            title: "Terms of Service",
+                            icon: Icons.termsOfService,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .termsOfService, in: .home)
+                            }
+                        )
+                        
+                        MenuRowView(
+                            title: "Privacy Policy",
+                            icon: Icons.privacyPolicy,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .privacyPolicy, in: .home)
+                            }
+                        )
+                    }
+                    
+                    // Sign Out (if authenticated)
+                    if authManager.isAuthenticated {
+                        SectionDivider()
+                        
+                        MenuRowView(
+                            title: "Sign Out",
+                            icon: Icons.signOut,
+                            iconColor: .red,
+                            action: {
+                                authManager.logout()
+                                navigationManager.resetNavigation()
+                                isShowing = false
+                            }
+                        )
                     }
                 }
-                .frame(width: UIScreen.main.bounds.width * 0.8)
-                .background(Color.white)
-                .offset(x: isShowing ? 0 : -UIScreen.main.bounds.width)
-                .animation(.easeInOut(duration: 0.3), value: isShowing)
-                
-                Spacer()
+                .padding(.vertical, 16)
             }
         }
-        .ignoresSafeArea()
+        .frame(maxWidth: .infinity)
+        .background(Color.white)
+        .sheet(isPresented: $showingBookingWebView) {
+            BookingWebView()
+        }
+    }
+}
+
+struct SectionDivider: View {
+    var body: some View {
+        Divider()
+            .padding(.vertical, 12)
+            .padding(.horizontal, 24)
     }
 }
