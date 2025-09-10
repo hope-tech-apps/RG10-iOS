@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import GoogleSignIn
 
 @main
 struct RG10App: App {
@@ -18,6 +19,10 @@ struct RG10App: App {
                 .environmentObject(appCoordinator)
                 .environmentObject(authManager)
                 .preferredColorScheme(.light)
+                .onOpenURL { url in
+                    GIDSignIn.sharedInstance.handle(url)
+                }
+
         }
     }
 }

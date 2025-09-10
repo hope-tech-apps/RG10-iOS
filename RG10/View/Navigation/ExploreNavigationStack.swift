@@ -90,11 +90,11 @@ struct ExploreMainView: View {
                     }
                 }
                 
-                // Player Spotlights
-                PlayerSpotlightsSection(
-                    spotlights: viewModel.playerSpotlights,
-                    selectedIndex: $selectedSpotlightIndex
-                )
+//                // Player Spotlights
+//                PlayerSpotlightsSection(
+//                    spotlights: viewModel.playerSpotlights,
+//                    selectedIndex: $selectedSpotlightIndex
+//                )
             }
             .padding(.vertical)
         }

@@ -5,14 +5,6 @@
 //  Created by Moneeb Sayed on 9/4/25.
 //
 
-
-//
-//  TrainingViewModel.swift
-//  RG10
-//
-//  Complete ViewModel implementation for Training feature
-//
-
 import SwiftUI
 import Combine
 

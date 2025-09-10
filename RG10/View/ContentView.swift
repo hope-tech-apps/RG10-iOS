@@ -7,15 +7,6 @@
 
 import SwiftUI
 
-//
-//  ContentView.swift
-//  RG10
-//
-//  Main app with notification handling
-//
-
-import SwiftUI
-
 struct ContentView: View {
     @StateObject private var navigationManager = NavigationManager.shared
     @StateObject private var authManager = AuthManager.shared

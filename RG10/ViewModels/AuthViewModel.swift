@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 // MARK: - Auth View Model Protocol
 protocol AuthViewModelProtocol: ObservableObject {
@@ -20,6 +21,7 @@ protocol AuthViewModelProtocol: ObservableObject {
     func login()
     func register()
     func clearError()
+    func openRegistration()
 }
 
 // MARK: - Auth View Model
@@ -34,7 +36,8 @@ class AuthViewModel: AuthViewModelProtocol {
     private let authService: AuthServiceProtocol
     private let authManager: AuthManager
     private var cancellables = Set<AnyCancellable>()
-    
+    let registrationURL = "https://www.oasyssports.com/RG10Football/global-login.cfm"
+
     init(authService: AuthServiceProtocol = AuthService(),
          authManager: AuthManager = .shared) {
         self.authService = authService
@@ -57,6 +60,12 @@ class AuthViewModel: AuthViewModelProtocol {
     }
     
     // MARK: - Actions
+    func openRegistration() {
+        if let url = URL(string: registrationURL) {
+            UIApplication.shared.open(url)
+        }
+    }
+    
     func login() {
         guard isLoginValid else {
             showError("Please enter username and password")

@@ -11,6 +11,7 @@ import AuthenticationServices
 struct SignUpContentView<ViewModel: AuthViewModelProtocol>: View {
     @ObservedObject var viewModel: ViewModel
     @Binding var showSignUp: Bool
+    @State private var isPasswordVisible = false
     
     var body: some View {
         ScrollView {
@@ -71,13 +72,31 @@ struct SignUpContentView<ViewModel: AuthViewModelProtocol>: View {
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(12)
                     
-                    // Password Field
+                    // Password Field with visibility toggle
                     HStack {
                         IconView(iconName: Icons.lock, size: 20, color: .gray)
-                        SecureField("Password", text: $viewModel.password)
-                            .textContentType(.newPassword)
-                            .accessibilityIdentifier(AccessibilityIdentifiers.passwordField)
-                        IconView(iconName: Icons.eye, size: 20, color: .gray)
+                        
+                        if isPasswordVisible {
+                            TextField("Password", text: $viewModel.password)
+                                .autocapitalization(.none)
+                                .autocorrectionDisabled(true)
+                                .textContentType(.oneTimeCode)
+                                .accessibilityIdentifier(AccessibilityIdentifiers.passwordField)
+                        } else {
+                            SecureField("Password", text: $viewModel.password)
+                                .textContentType(.newPassword)
+                                .accessibilityIdentifier(AccessibilityIdentifiers.passwordField)
+                        }
+                        
+                        Button(action: {
+                            isPasswordVisible.toggle()
+                        }) {
+                            IconView(
+                                iconName: isPasswordVisible ? Icons.eye : Icons.hide,
+                                size: 20,
+                                color: .gray
+                            )
+                        }
                     }
                     .padding()
                     .background(Color.gray.opacity(0.1))
@@ -102,80 +121,44 @@ struct SignUpContentView<ViewModel: AuthViewModelProtocol>: View {
                     .background(AppConstants.Colors.primaryRed)
                     .cornerRadius(25)
                 }
-                .disabled(viewModel.isLoading)
+                .disabled(viewModel.isLoading || viewModel.username.isEmpty || viewModel.email.isEmpty || viewModel.password.isEmpty)
                 .accessibilityIdentifier(AccessibilityIdentifiers.signUpButton)
                 .padding(.horizontal, 24)
                 
-                // Or Continue With
-                VStack(spacing: 16) {
-                    Text("or continue with")
+                // Already have an account?
+                HStack {
+                    Text("Already have an account?")
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
-                        .padding(.vertical, 8)
                     
-                    // Social Login Buttons
-                    VStack(spacing: 12) {
-                        // Google Sign In
-                        Button(action: { handleGoogleSignIn() }) {
-                            HStack {
-                                Image("google-icon") // You'll need to add this to assets
-                                    .resizable()
-                                    .frame(width: 20, height: 20)
-                                Text("Continue with Google")
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(.black)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color.white)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 25)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                            )
-                        }
-                        
-                        // Apple Sign In
-                        SignInWithAppleButton(
-                            .signUp,
-                            onRequest: { request in
-                                request.requestedScopes = [.fullName, .email]
-                            },
-                            onCompletion: { result in
-                                handleAppleSignIn(result)
-                            }
-                        )
-                        .signInWithAppleButtonStyle(.black)
-                        .frame(height: 50)
-                        .cornerRadius(25)
+                    Button(action: { showSignUp = false }) {
+                        Text("Sign In")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(AppConstants.Colors.primaryRed)
                     }
-                    .padding(.horizontal, 24)
                 }
+                .padding(.top, 8)
                 
                 Spacer(minLength: 40)
             }
         }
         .background(Color.white)
         .alert("Error", isPresented: $viewModel.isShowingError) {
-            Button("OK") { viewModel.clearError() }
+            Button("OK") {
+                viewModel.clearError()
+            }
         } message: {
             Text(viewModel.errorMessage ?? "An error occurred")
         }
     }
-    
-    // MARK: - Social Login Handlers
-    private func handleGoogleSignIn() {
-        // TODO: Implement Google Sign In
-        print("Google Sign In tapped")
-    }
-    
-    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
-        switch result {
-        case .success(let authorization):
-            // TODO: Handle Apple Sign In authorization
-            print("Apple Sign In successful")
-        case .failure(let error):
-            viewModel.errorMessage = error.localizedDescription
-            viewModel.isShowingError = true
-        }
+}
+
+// MARK: - Preview
+struct SignUpContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        SignUpContentView(
+            viewModel: AuthViewModel(),
+            showSignUp: .constant(true)
+        )
     }
 }

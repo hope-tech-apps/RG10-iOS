@@ -83,7 +83,7 @@ struct LoginView<ViewModel: AuthViewModelProtocol>: View {
                         .padding(.horizontal, 24)
                         
                         // Forgot Password
-                        Button(action: { showForgotPassword = true }) {
+                        Button(action: { viewModel.openRegistration() }) {
                             Text("Forgot the password?")
                                 .font(.system(size: 14))
                                 .foregroundColor(AppConstants.Colors.primaryRed)
@@ -103,51 +103,51 @@ struct LoginView<ViewModel: AuthViewModelProtocol>: View {
                         .padding(.horizontal, 24)
                         
                         // Or Continue With
-                        VStack(spacing: 16) {
-                            Text("or continue with")
-                                .font(.system(size: 14))
-                                .foregroundColor(.gray)
-                                .padding(.vertical, 8)
-                            
-                            // Social Login Buttons
-                            VStack(spacing: 12) {
-                                // Google Sign In
-                                Button(action: { handleGoogleSignIn() }) {
-                                    HStack {
-                                        Image("google-icon") // You'll need to add this to assets
-                                            .resizable()
-                                            .frame(width: 20, height: 20)
-                                        Text("Continue with Google")
-                                            .font(.system(size: 16, weight: .medium))
-                                            .foregroundColor(.black)
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
-                                    .background(Color.white)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 25)
-                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                    )
-                                }
-                                
-                                // Apple Sign In
-                                SignInWithAppleButton(
-                                    .signIn,
-                                    onRequest: { request in
-                                        request.requestedScopes = [.fullName, .email]
-                                    },
-                                    onCompletion: { result in
-                                        handleAppleSignIn(result)
-                                    }
-                                )
-                                .signInWithAppleButtonStyle(.black)
-                                .frame(height: 50)
-                                .cornerRadius(25)
-                            }
-                            .padding(.horizontal, 24)
-                        }
-                        
-                        Spacer(minLength: 40)
+//                        VStack(spacing: 16) {
+//                            Text("or continue with")
+//                                .font(.system(size: 14))
+//                                .foregroundColor(.gray)
+//                                .padding(.vertical, 8)
+//                            
+//                            // Social Login Buttons
+//                            VStack(spacing: 12) {
+//                                // Google Sign In
+//                                Button(action: { handleGoogleSignIn() }) {
+//                                    HStack {
+//                                        Image("google-icon") // You'll need to add this to assets
+//                                            .resizable()
+//                                            .frame(width: 20, height: 20)
+//                                        Text("Continue with Google")
+//                                            .font(.system(size: 16, weight: .medium))
+//                                            .foregroundColor(.black)
+//                                    }
+//                                    .frame(maxWidth: .infinity)
+//                                    .padding(.vertical, 16)
+//                                    .background(Color.white)
+//                                    .overlay(
+//                                        RoundedRectangle(cornerRadius: 25)
+//                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+//                                    )
+//                                }
+//                                
+//                                // Apple Sign In
+//                                SignInWithAppleButton(
+//                                    .signIn,
+//                                    onRequest: { request in
+//                                        request.requestedScopes = [.fullName, .email]
+//                                    },
+//                                    onCompletion: { result in
+//                                        handleAppleSignIn(result)
+//                                    }
+//                                )
+//                                .signInWithAppleButtonStyle(.black)
+//                                .frame(height: 50)
+//                                .cornerRadius(25)
+//                            }
+//                            .padding(.horizontal, 24)
+//                        }
+//                        
+//                        Spacer(minLength: 40)
                     }
                 }
                 

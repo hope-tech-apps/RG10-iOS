@@ -69,15 +69,15 @@ struct ExploreView: View {
                 )
                 .padding(.top, 32)
                 
-                // Player Spotlights Section
-                PlayerSpotlightsSection(
-                    spotlights: viewModel.playerSpotlights,
-                    selectedIndex: $selectedSpotlightIndex
-                )
-                .padding(.top, 32)
-                
-                // Bottom padding for tab bar
-                Color.clear.frame(height: 100)
+//                // Player Spotlights Section
+//                PlayerSpotlightsSection(
+//                    spotlights: viewModel.playerSpotlights,
+//                    selectedIndex: $selectedSpotlightIndex
+//                )
+//                .padding(.top, 32)
+//                
+//                // Bottom padding for tab bar
+//                Color.clear.frame(height: 100)
             }
         }
         .background(Color.white)
