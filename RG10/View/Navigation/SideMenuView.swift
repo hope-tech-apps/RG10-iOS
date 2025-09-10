@@ -50,14 +50,14 @@ struct SideMenuView: View {
                                 }
                             )
                             
-                            MenuRowView(
-                                title: "Create Account",
-                                icon: Icons.createAccount,
-                                action: {
-                                    isShowing = false
-                                    navigationManager.selectedTab = .account
-                                }
-                            )
+//                            MenuRowView(
+//                                title: "Create Account",
+//                                icon: Icons.createAccount,
+//                                action: {
+//                                    isShowing = false
+//                                    navigationManager.selectedTab = .account
+//                                }
+//                            )
                         }
                         
                         SectionDivider()
@@ -92,14 +92,14 @@ struct SideMenuView: View {
                             }
                         )
                         
-                        MenuRowView(
-                            title: "Player Spotlights",
-                            icon: Icons.playerSpotlights,
-                            action: {
-                                isShowing = false
-                                navigationManager.navigate(to: .playerSpotlights, in: .home)
-                            }
-                        )
+//                        MenuRowView(
+//                            title: "Player Spotlights",
+//                            icon: Icons.playerSpotlights,
+//                            action: {
+//                                isShowing = false
+//                                navigationManager.navigate(to: .playerSpotlights, in: .home)
+//                            }
+//                        )
                         
                         MenuRowView(
                             title: "Merch Store",

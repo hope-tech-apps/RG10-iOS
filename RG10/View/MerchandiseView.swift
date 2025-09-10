@@ -7,10 +7,8 @@
 
 import SwiftUI
 
-// MARK: - Main Merchandise View
 struct SupabaseMerchandiseView: View {
     @StateObject private var viewModel = SupabaseMerchandiseViewModel()
-    @State private var navigationPath = NavigationPath()
     
     private let columns = [
         GridItem(.flexible()),
@@ -18,101 +16,97 @@ struct SupabaseMerchandiseView: View {
     ]
     
     var body: some View {
-        NavigationStack(path: $navigationPath) {
-            VStack(spacing: 0) {
-                // Search Bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
-                    
-                    TextField("Search products...", text: $viewModel.searchText)
-                        .textFieldStyle(PlainTextFieldStyle())
-                        .onChange(of: viewModel.searchText) { _ in
-                            viewModel.filterProducts()
-                        }
-                    
-                    if !viewModel.searchText.isEmpty {
-                        Button(action: {
-                            viewModel.searchText = ""
-                            viewModel.filterProducts()
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.gray)
-                        }
-                    }
-                }
-                .padding(12)
-                .background(Color(UIColor.systemGray5))
-                .cornerRadius(10)
-                .padding(.horizontal)
-                .padding(.vertical, 8)
+        VStack(spacing: 0) {
+            // Search Bar
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
                 
-                // Products Grid
-                if viewModel.isLoading {
-                    Spacer()
-                    ProgressView("Loading products...")
-                        .padding()
-                    Spacer()
-                } else if let error = viewModel.errorMessage {
-                    Spacer()
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 50))
-                            .foregroundColor(.orange)
-                        Text(error)
-                            .font(.system(size: 16))
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                        Button("Retry") {
-                            Task {
-                                await viewModel.loadProducts()
-                            }
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 12)
-                        .background(AppConstants.Colors.primaryRed)
-                        .cornerRadius(8)
+                TextField("Search products...", text: $viewModel.searchText)
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .onChange(of: viewModel.searchText) { _ in
+                        viewModel.filterProducts()
                     }
-                    Spacer()
-                } else if viewModel.filteredProducts.isEmpty {
-                    Spacer()
-                    VStack(spacing: 16) {
-                        Image(systemName: "bag.fill")
-                            .font(.system(size: 60))
-                            .foregroundColor(.gray.opacity(0.5))
-                        
-                        Text("No products found")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.black)
-                        
-                        Text("Try adjusting your filters or search terms")
-                            .font(.system(size: 14))
+                
+                if !viewModel.searchText.isEmpty {
+                    Button(action: {
+                        viewModel.searchText = ""
+                        viewModel.filterProducts()
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
                             .foregroundColor(.gray)
                     }
-                    Spacer()
-                } else {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 16) {
-                            ForEach(viewModel.filteredProducts, id: \.id) { product in
-                                NavigationLink(value: product) {
-                                    SupabaseProductCard(product: product)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                        }
-                        .padding()
-                    }
-                    .background(Color(UIColor.systemGray6))
                 }
             }
-            .navigationTitle("Merchandise")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: DBProduct.self) { product in
-                SupabaseProductDetailView(product: product)
+            .padding(12)
+            .background(Color(UIColor.systemGray5))
+            .cornerRadius(10)
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            
+            // Products Grid
+            if viewModel.isLoading {
+                Spacer()
+                ProgressView("Loading products...")
+                    .padding()
+                Spacer()
+            } else if let error = viewModel.errorMessage {
+                Spacer()
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 50))
+                        .foregroundColor(.orange)
+                    Text(error)
+                        .font(.system(size: 16))
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                    Button("Retry") {
+                        Task {
+                            await viewModel.loadProducts()
+                        }
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(AppConstants.Colors.primaryRed)
+                    .cornerRadius(8)
+                }
+                Spacer()
+            } else if viewModel.filteredProducts.isEmpty {
+                Spacer()
+                VStack(spacing: 16) {
+                    Image(systemName: "bag.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.gray.opacity(0.5))
+                    
+                    Text("No products found")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.black)
+                    
+                    Text("Try adjusting your filters or search terms")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                }
+                Spacer()
+            } else {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(viewModel.filteredProducts, id: \.id) { product in
+                            NavigationLink(value: NavigationDestination.merchandiseDetail(product)) {
+                                SupabaseProductCard(product: product)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                    .padding()
+                }
+                .background(Color(UIColor.systemGray6))
             }
         }
+        .navigationTitle("Merchandise")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 
@@ -304,33 +298,33 @@ struct SupabaseProductDetailView: View {
                     }
                     
                     // Quantity
-                    HStack {
-                        Text("Quantity")
-                            .font(.headline)
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 20) {
-                            Button(action: viewModel.decrementQuantity) {
-                                Image(systemName: "minus.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(viewModel.quantity > 1 ? AppConstants.Colors.primaryRed : .gray)
-                            }
-                            .disabled(viewModel.quantity <= 1)
-                            
-                            Text("\(viewModel.quantity)")
-                                .font(.title2.bold())
-                                .frame(width: 50)
-                            
-                            Button(action: viewModel.incrementQuantity) {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(viewModel.quantity < 10 ? AppConstants.Colors.primaryRed : .gray)
-                            }
-                            .disabled(viewModel.quantity >= 10)
-                        }
-                    }
-                    .padding(.vertical)
+//                    HStack {
+//                        Text("Quantity")
+//                            .font(.headline)
+//                        
+//                        Spacer()
+//                        
+//                        HStack(spacing: 20) {
+//                            Button(action: viewModel.decrementQuantity) {
+//                                Image(systemName: "minus.circle.fill")
+//                                    .font(.title2)
+//                                    .foregroundColor(viewModel.quantity > 1 ? AppConstants.Colors.primaryRed : .gray)
+//                            }
+//                            .disabled(viewModel.quantity <= 1)
+//                            
+//                            Text("\(viewModel.quantity)")
+//                                .font(.title2.bold())
+//                                .frame(width: 50)
+//                            
+//                            Button(action: viewModel.incrementQuantity) {
+//                                Image(systemName: "plus.circle.fill")
+//                                    .font(.title2)
+//                                    .foregroundColor(viewModel.quantity < 10 ? AppConstants.Colors.primaryRed : .gray)
+//                            }
+//                            .disabled(viewModel.quantity >= 10)
+//                        }
+//                    }
+//                    .padding(.vertical)
                     
                     // Total
                     if viewModel.selectedSize != nil {

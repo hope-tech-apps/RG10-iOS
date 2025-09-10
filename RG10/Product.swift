@@ -12,6 +12,7 @@ import Combine
 
 // MARK: - Database Models (matching your Supabase schema)
 
+// MARK: - Database Models
 struct DBProduct: Codable, Hashable {
     let id: Int
     let name: String
@@ -22,10 +23,9 @@ struct DBProduct: Codable, Hashable {
     let is_featured: Bool
     let stripe_product_id: String?
     let stripe_payment_link: String?
-    let created_at: Date
-    let updated_at: Date
+    let created_at: String  // Changed to String to handle raw format
+    let updated_at: String  // Changed to String to handle raw format
     
-    // Direct access to image array
     var imageArray: [String] {
         return image_urls ?? []
     }
@@ -37,7 +37,6 @@ struct DBProduct: Codable, Hashable {
     static func == (lhs: DBProduct, rhs: DBProduct) -> Bool {
         lhs.id == rhs.id
     }
-
 }
 
 struct DBCategory: Codable {
@@ -74,22 +73,21 @@ class SupabaseMerchandiseService: ObservableObject {
         options: SupabaseClientOptions(db: .init(schema: "rg10"))
     )
     
-    // MARK: - Fetch All Products
+    // MARK: - Fetch All Products (Fixed)
     func fetchProducts() async throws -> [DBProduct] {
         let response = try await client
             .from("products")
             .select()
             .execute()
         
+        // Don't specify date decoding strategy - let it decode as strings
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
         let products = try decoder.decode([DBProduct].self, from: response.data)
         return products
     }
     
-    // MARK: - Fetch Product Sizes for Specific Product
+    // Rest of the methods remain the same...
     func fetchProductSizes(for productId: Int) async throws -> [ProductSizeDetail] {
-        // First fetch product_sizes for this product
         let productSizesResponse = try await client
             .from("product_sizes")
             .select("*")
@@ -98,7 +96,6 @@ class SupabaseMerchandiseService: ObservableObject {
         
         let productSizes = try JSONDecoder().decode([DBProductSize].self, from: productSizesResponse.data)
         
-        // Fetch all sizes to get size names
         let sizesResponse = try await client
             .from("sizes")
             .select("*")
@@ -106,10 +103,8 @@ class SupabaseMerchandiseService: ObservableObject {
         
         let sizes = try JSONDecoder().decode([DBSize].self, from: sizesResponse.data)
         
-        // Create a dictionary for quick lookup
         let sizesDict = Dictionary(uniqueKeysWithValues: sizes.map { ($0.id, $0) })
         
-        // Map to ProductSizeDetail
         var sizeDetails: [ProductSizeDetail] = []
         
         for productSize in productSizes {
@@ -130,7 +125,6 @@ class SupabaseMerchandiseService: ObservableObject {
             }
         }
         
-        // Sort by size_type (Youth first) then by typical size order
         let sizeOrder = ["small", "medium", "large", "xl", "2xl"]
         sizeDetails.sort { first, second in
             if first.sizeType != second.sizeType {
@@ -144,7 +138,6 @@ class SupabaseMerchandiseService: ObservableObject {
         return sizeDetails
     }
     
-    // MARK: - Fetch Categories
     func fetchCategories() async throws -> [DBCategory] {
         let response = try await client
             .from("categories")

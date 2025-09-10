@@ -74,27 +74,6 @@ struct TrainingPackagesView: View {
                     .background(Color(UIColor.systemGray6))
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 16, weight: .semibold))
-                            Text("Back")
-                                .font(.system(size: 16))
-                        }
-                        .foregroundColor(AppConstants.Colors.primaryRed)
-                    }
-                }
-                
-                ToolbarItem(placement: .principal) {
-                    Image(AppConstants.Images.logoColor)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 30)
-                }
-            }
         }
     }
 }

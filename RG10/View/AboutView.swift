@@ -42,8 +42,8 @@ struct AboutView: View {
                     // Stats Section
                     StatsSection()
                     
-                    // App Preview Section
-                    AppPreviewSection(features: appFeatures)
+//                    // App Preview Section
+//                    AppPreviewSection(features: appFeatures)
                     
                     // TST Section
                     TSTSection()
@@ -86,23 +86,6 @@ struct HeroSection: View {
             
             // Content
             VStack {
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .renderingMode(.template)
-                            .iconStyle(size: 20, color: .white)
-                            .padding(12)
-                            .background(Color.white.opacity(0.2))
-                            .clipShape(Circle())
-                    }
-                    .padding(.leading)
-                    
-                    Spacer()
-                }
-                .padding(.top, 50)
-                
-                Spacer()
-                
                 VStack(spacing: 8) {
                     Text("ABOUT")
                         .font(.system(size: 14, weight: .semibold))
@@ -117,7 +100,6 @@ struct HeroSection: View {
                         .font(.system(size: 16))
                         .foregroundColor(.white.opacity(0.9))
                 }
-                .padding(.bottom, 40)
             }
         }
         .frame(height: 300)
@@ -493,22 +475,10 @@ struct CTASection: View {
                     .foregroundColor(AppConstants.Colors.primaryRed)
             }
             
-            Button(action: {}) {
-                HStack {
-                    Text("Join RG10 Family")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.white)
-                    
-                    Image(Icons.chevronRight)
-                        .renderingMode(.template)
-                        .iconStyle(size: 16, color: .white)
-                }
-                .padding(.horizontal, 32)
-                .padding(.vertical, 16)
-                .background(AppConstants.Colors.primaryRed)
-                .cornerRadius(30)
-            }
-            
+            Text("RG10 Football")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.black)
+
             Text("BUILT FOR PURPOSE")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.gray)
