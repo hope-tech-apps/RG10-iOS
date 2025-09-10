@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import UIKit
+import SwiftUI
 
 // MARK: - Auth View Model Protocol
 protocol AuthViewModelProtocol: ObservableObject {
@@ -18,13 +18,14 @@ protocol AuthViewModelProtocol: ObservableObject {
     var errorMessage: String? { get set }
     var isShowingError: Bool { get set }
     
-    func login()
-    func register()
-    func clearError()
-    func openRegistration()
+    func login() async
+    func register() async
+    func clearError() async
+    func openRegistration() async
 }
 
 // MARK: - Auth View Model
+@MainActor
 class AuthViewModel: AuthViewModelProtocol {
     @Published var username = ""
     @Published var email = ""
@@ -35,9 +36,8 @@ class AuthViewModel: AuthViewModelProtocol {
     
     private let authService: AuthServiceProtocol
     private let authManager: AuthManager
-    private var cancellables = Set<AnyCancellable>()
-    let registrationURL = "https://www.oasyssports.com/RG10Football/global-login.cfm"
-
+    let registrationURL = "https://www.rg10football.com/wp-login.php?action=lostpassword"
+    
     init(authService: AuthServiceProtocol = AuthService(),
          authManager: AuthManager = .shared) {
         self.authService = authService
@@ -72,22 +72,24 @@ class AuthViewModel: AuthViewModelProtocol {
             return
         }
         
+        Task {
+            await performLogin()
+        }
+    }
+    
+    @MainActor
+    private func performLogin() async {
         isLoading = true
         errorMessage = nil
         
-        authService.login(username: username, password: password)
-            .sink(
-                receiveCompletion: { [weak self] completion in
-                    self?.isLoading = false
-                    if case .failure(let error) = completion {
-                        self?.showError(error.localizedDescription)
-                    }
-                },
-                receiveValue: { [weak self] response in
-                    self?.authManager.saveUser(from: response)
-                }
-            )
-            .store(in: &cancellables)
+        do {
+            let response = try await authService.login(username: username, password: password)
+            authManager.saveUser(from: response)
+        } catch {
+            showError(error.localizedDescription)
+        }
+        
+        isLoading = false
     }
     
     func register() {
@@ -100,28 +102,31 @@ class AuthViewModel: AuthViewModelProtocol {
             return
         }
         
+        Task {
+            await performRegistration()
+        }
+    }
+    
+    @MainActor
+    private func performRegistration() async {
         isLoading = true
         errorMessage = nil
         
-        authService.register(username: username, email: email, password: password)
-            .sink(
-                receiveCompletion: { [weak self] completion in
-                    self?.isLoading = false
-                    if case .failure(let error) = completion {
-                        self?.showError(error.localizedDescription)
-                    }
-                },
-                receiveValue: { [weak self] response in
-                    if response.success, let data = response.data {
-                        self?.authManager.saveUser(from: data)
-                        // After registration, perform login to get token
-                        self?.login()
-                    } else {
-                        self?.showError(response.message)
-                    }
-                }
-            )
-            .store(in: &cancellables)
+        do {
+            let response = try await authService.register(username: username, email: email, password: password)
+            
+            if response.success, let data = response.data {
+                authManager.saveUser(from: data)
+                // After registration, perform login to get token
+                await performLogin()
+            } else {
+                showError(response.message)
+            }
+        } catch {
+            showError(error.localizedDescription)
+        }
+        
+        isLoading = false
     }
     
     func clearError() {

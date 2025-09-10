@@ -1,107 +1,11 @@
 //
-//  ExploreNavigationStack.swift
+//  VideoThumbnailCard.swift
 //  RG10
 //
-//  Created by Moneeb Sayed on 9/8/25.
+//  Created by Moneeb Sayed on 9/10/25.
 //
 
 import SwiftUI
-
-struct ExploreNavigationStack: View {
-    @EnvironmentObject var navigationManager: NavigationManager
-    @StateObject private var viewModel = ExploreViewModel()
-    
-    var body: some View {
-        NavigationStack(path: $navigationManager.explorePath) {
-            ExploreMainView()
-                .environmentObject(viewModel)
-                .navigationDestination(for: NavigationDestination.self) { destination in
-                    destinationView(for: destination)
-                }
-                .navigationDestination(for: Coach.self) { coach in
-                    CoachDetailView(coach: coach)
-                }
-                .navigationDestination(for: ExploreVideoItem.self) { video in
-                    VideoPlayerDetailView(video: video)
-                }
-        }
-    }
-    
-    @ViewBuilder
-    private func destinationView(for destination: NavigationDestination) -> some View {
-        switch destination {
-        case .coachProfile(let coach):
-            CoachDetailView(coach: coach)
-        case .videoPlayer(let video):
-            VideoPlayerDetailView(video: video)
-        case .playerSpotlight(let spotlight):
-            PlayerSpotlightDetailView(spotlight: spotlight)
-        default:
-            EmptyView()
-        }
-    }
-}
-
-struct ExploreMainView: View {
-    @EnvironmentObject var viewModel: ExploreViewModel
-    @EnvironmentObject var navigationManager: NavigationManager
-    @State private var selectedVideoIndex = 0
-    @State private var selectedSpotlightIndex = 0
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 32) {
-                // Coaches Section with Navigation
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Meet the Coaches")
-                        .font(.system(size: 20, weight: .bold))
-                        .padding(.horizontal)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            ForEach(viewModel.coaches) { coach in
-                                NavigationLink(value: coach) {
-                                    CoachCard(coach: coach) { }
-                                        .allowsHitTesting(false)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                }
-                
-                // Videos Section
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Training Videos")
-                        .font(.system(size: 20, weight: .bold))
-                        .padding(.horizontal)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            ForEach(viewModel.recommendedVideos) { video in
-                                NavigationLink(value: video) {
-                                    VideoThumbnailCard(video: video)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                }
-                
-//                // Player Spotlights
-//                PlayerSpotlightsSection(
-//                    spotlights: viewModel.playerSpotlights,
-//                    selectedIndex: $selectedSpotlightIndex
-//                )
-            }
-            .padding(.vertical)
-        }
-        .navigationTitle("Explore")
-        .navigationBarTitleDisplayMode(.large)
-    }
-}
 
 // Video Thumbnail Card
 struct VideoThumbnailCard: View {

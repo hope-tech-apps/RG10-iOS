@@ -77,7 +77,7 @@ struct LoginContentView<ViewModel: AuthViewModelProtocol>: View {
                 .padding(.horizontal, 24)
                 
                 // Sign In Button
-                Button(action: { viewModel.login() }) {
+                Button(action: { Task { await viewModel.login() }}) {
                     ZStack {
                         if viewModel.isLoading {
                             ProgressView()
@@ -127,7 +127,7 @@ struct LoginContentView<ViewModel: AuthViewModelProtocol>: View {
         .background(Color.white)
         .alert("Error", isPresented: $viewModel.isShowingError) {
             Button("OK") {
-                viewModel.clearError()
+                Task { await viewModel.clearError() }
             }
         } message: {
             Text(viewModel.errorMessage ?? "An error occurred")

@@ -105,7 +105,7 @@ struct SignUpContentView<ViewModel: AuthViewModelProtocol>: View {
                 .padding(.horizontal, 24)
                 
                 // Sign Up Button
-                Button(action: { viewModel.register() }) {
+                Button(action: { Task { await viewModel.register() } }) {
                     ZStack {
                         if viewModel.isLoading {
                             ProgressView()
@@ -145,7 +145,7 @@ struct SignUpContentView<ViewModel: AuthViewModelProtocol>: View {
         .background(Color.white)
         .alert("Error", isPresented: $viewModel.isShowingError) {
             Button("OK") {
-                viewModel.clearError()
+                Task { await viewModel.clearError() }
             }
         } message: {
             Text(viewModel.errorMessage ?? "An error occurred")

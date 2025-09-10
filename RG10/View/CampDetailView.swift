@@ -1,40 +1,11 @@
 //
-//  TrainingNavigationStack.swift
+//  CampDetailView.swift
 //  RG10
 //
-//  Created by Moneeb Sayed on 9/8/25.
+//  Created by Moneeb Sayed on 9/10/25.
 //
 
 import SwiftUI
-
-struct TrainingNavigationStack: View {
-    @EnvironmentObject var navigationManager: NavigationManager
-    @StateObject private var viewModel = TrainingViewModel()
-    
-    var body: some View {
-        NavigationStack(path: $navigationManager.trainingPath) {
-            TrainingTabView()
-                .environmentObject(viewModel)
-                .navigationDestination(for: NavigationDestination.self) { destination in
-                    destinationView(for: destination)
-                }
-        }
-    }
-    
-    @ViewBuilder
-    private func destinationView(for destination: NavigationDestination) -> some View {
-        switch destination {
-        case .trainingPackages:
-            TrainingPackagesView()
-        case .campDetail(let camp):
-            CampDetailView(camp: camp)
-        case .workoutDetail(let workoutId):
-            WorkoutDetailView(workoutId: workoutId)
-        default:
-            EmptyView()
-        }
-    }
-}
 
 // Camp Detail View
 struct CampDetailView: View {

@@ -6,12 +6,11 @@
 //
 
 import Foundation
-import Combine
 
 // MARK: - Auth Service Protocol
 protocol AuthServiceProtocol {
-    func login(username: String, password: String) -> AnyPublisher<AuthResponse, AuthError>
-    func register(username: String, email: String, password: String) -> AnyPublisher<RegisterResponse, AuthError>
+    func login(username: String, password: String) async throws -> AuthResponse
+    func register(username: String, email: String, password: String) async throws -> RegisterResponse
 }
 
 // MARK: - Auth Service Implementation
@@ -23,10 +22,9 @@ class AuthService: AuthServiceProtocol {
         self.session = session
     }
     
-    func login(username: String, password: String) -> AnyPublisher<AuthResponse, AuthError> {
+    func login(username: String, password: String) async throws -> AuthResponse {
         guard let url = URL(string: "\(baseURL)/jwt-auth/v1/token") else {
-            return Fail(error: AuthError.invalidResponse)
-                .eraseToAnyPublisher()
+            throw AuthError.invalidResponse
         }
         
         var request = URLRequest(url: url)
@@ -36,24 +34,21 @@ class AuthService: AuthServiceProtocol {
         let parameters = "username=\(username)&password=\(password)"
         request.httpBody = parameters.data(using: .utf8)
         
-        return session.dataTaskPublisher(for: request)
-            .map(\.data)
-            .decode(type: AuthResponse.self, decoder: JSONDecoder())
-            .mapError { error in
-                if error is DecodingError {
-                    return AuthError.invalidResponse
-                } else {
-                    return AuthError.networkError
-                }
-            }
-            .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
+        do {
+            let (data, _) = try await session.data(for: request)
+            print(String(data: data, encoding: .utf8) ?? "No data")
+            let response = try JSONDecoder().decode(AuthResponse.self, from: data)
+            return response
+        } catch is DecodingError {
+            throw AuthError.invalidResponse
+        } catch {
+            throw AuthError.networkError
+        }
     }
     
-    func register(username: String, email: String, password: String) -> AnyPublisher<RegisterResponse, AuthError> {
+    func register(username: String, email: String, password: String) async throws -> RegisterResponse {
         guard let url = URL(string: "\(baseURL)/api/v1/register") else {
-            return Fail(error: AuthError.invalidResponse)
-                .eraseToAnyPublisher()
+            throw AuthError.invalidResponse
         }
         
         var request = URLRequest(url: url)
@@ -69,22 +64,18 @@ class AuthService: AuthServiceProtocol {
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
         } catch {
-            return Fail(error: AuthError.invalidResponse)
-                .eraseToAnyPublisher()
+            throw AuthError.invalidResponse
         }
         
-        return session.dataTaskPublisher(for: request)
-            .map(\.data)
-            .decode(type: RegisterResponse.self, decoder: JSONDecoder())
-            .mapError { error in
-                if error is DecodingError {
-                    return AuthError.invalidResponse
-                } else {
-                    return AuthError.networkError
-                }
-            }
-            .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
+        do {
+            let (data, _) = try await session.data(for: request)
+            let response = try JSONDecoder().decode(RegisterResponse.self, from: data)
+            return response
+        } catch is DecodingError {
+            throw AuthError.invalidResponse
+        } catch {
+            throw AuthError.networkError
+        }
     }
 }
 
@@ -94,40 +85,32 @@ class MockAuthService: AuthServiceProtocol {
     var loginCallCount = 0
     var registerCallCount = 0
     
-    func login(username: String, password: String) -> AnyPublisher<AuthResponse, AuthError> {
+    func login(username: String, password: String) async throws -> AuthResponse {
         loginCallCount += 1
         
         if shouldSucceed {
-            let response = AuthResponse(
+            return AuthResponse(
                 token: "mock_token",
                 userEmail: "test@example.com",
                 userNicename: username,
                 userDisplayName: "Test User"
             )
-            return Just(response)
-                .setFailureType(to: AuthError.self)
-                .eraseToAnyPublisher()
         } else {
-            return Fail(error: AuthError.invalidCredentials)
-                .eraseToAnyPublisher()
+            throw AuthError.invalidCredentials
         }
     }
     
-    func register(username: String, email: String, password: String) -> AnyPublisher<RegisterResponse, AuthError> {
+    func register(username: String, email: String, password: String) async throws -> RegisterResponse {
         registerCallCount += 1
         
         if shouldSucceed {
-            let response = RegisterResponse(
+            return RegisterResponse(
                 success: true,
                 message: "Registration successful",
                 data: RegisterData(userId: 1, username: username, email: email)
             )
-            return Just(response)
-                .setFailureType(to: AuthError.self)
-                .eraseToAnyPublisher()
         } else {
-            return Fail(error: AuthError.registrationFailed("Username already exists"))
-                .eraseToAnyPublisher()
+            throw AuthError.registrationFailed("Username already exists")
         }
     }
 }

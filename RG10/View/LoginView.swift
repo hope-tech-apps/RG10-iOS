@@ -62,7 +62,7 @@ struct LoginView<ViewModel: AuthViewModelProtocol>: View {
                         .padding(.horizontal, 24)
                         
                         // Sign In Button
-                        Button(action: { viewModel.login() }) {
+                        Button(action: { Task { await viewModel.login() } }) {
                             ZStack {
                                 if viewModel.isLoading {
                                     ProgressView()
@@ -83,7 +83,7 @@ struct LoginView<ViewModel: AuthViewModelProtocol>: View {
                         .padding(.horizontal, 24)
                         
                         // Forgot Password
-                        Button(action: { viewModel.openRegistration() }) {
+                        Button(action: { Task { await viewModel.openRegistration() } }) {
                             Text("Forgot the password?")
                                 .font(.system(size: 14))
                                 .foregroundColor(AppConstants.Colors.primaryRed)
@@ -175,7 +175,7 @@ struct LoginView<ViewModel: AuthViewModelProtocol>: View {
             .navigationBarHidden(true)
             .accessibilityIdentifier(AccessibilityIdentifiers.loginScreen)
             .alert("Error", isPresented: $viewModel.isShowingError) {
-                Button("OK") { viewModel.clearError() }
+                Button("OK") { Task { await viewModel.clearError() } }
             } message: {
                 Text(viewModel.errorMessage ?? "An error occurred")
             }
@@ -185,20 +185,20 @@ struct LoginView<ViewModel: AuthViewModelProtocol>: View {
         }
     }
     
-    // MARK: - Social Login Handlers
-    private func handleGoogleSignIn() {
-        // TODO: Implement Google Sign In
-        print("Google Sign In tapped")
-    }
-    
-    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
-        switch result {
-        case .success(let authorization):
-            // TODO: Handle Apple Sign In authorization
-            print("Apple Sign In successful")
-        case .failure(let error):
-            viewModel.errorMessage = error.localizedDescription
-            viewModel.isShowingError = true
-        }
-    }
+//    // MARK: - Social Login Handlers
+//    private func handleGoogleSignIn() {
+//        // TODO: Implement Google Sign In
+//        print("Google Sign In tapped")
+//    }
+//    
+//    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
+//        switch result {
+//        case .success(let authorization):
+//            // TODO: Handle Apple Sign In authorization
+//            print("Apple Sign In successful")
+//        case .failure(let error):
+//            viewModel.errorMessage = error.localizedDescription
+//            viewModel.isShowingError = true
+//        }
+//    }
 }

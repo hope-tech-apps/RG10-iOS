@@ -73,7 +73,7 @@ struct SignUpView<ViewModel: AuthViewModelProtocol>: View {
                         .padding(.horizontal, 24)
                         
                         // Sign Up Button
-                        Button(action: { viewModel.register() }) {
+                        Button(action: { Task { await viewModel.register() } }) {
                             ZStack {
                                 if viewModel.isLoading {
                                     ProgressView()
@@ -166,7 +166,7 @@ struct SignUpView<ViewModel: AuthViewModelProtocol>: View {
             .navigationBarHidden(true)
             .accessibilityIdentifier(AccessibilityIdentifiers.signUpScreen)
             .alert("Error", isPresented: $viewModel.isShowingError) {
-                Button("OK") { viewModel.clearError() }
+                Button("OK") { Task { await viewModel.clearError() } }
             } message: {
                 Text(viewModel.errorMessage ?? "An error occurred")
             }
