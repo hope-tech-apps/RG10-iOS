@@ -49,7 +49,7 @@ class HomeViewModel: HomeViewModelProtocol {
         CarouselItem(
             imageName: AppConstants.Images.soccerBackground,
             title: "Join RG10 Family",
-            subtitle: "Start your journey with us today",
+            subtitle: "Unleash Your Full Potential on the Field, and off the Field",
             buttonTitle: "Apply Now",
             buttonAction: .applyNow,
             requiresAuth: false // Show only when NOT authenticated

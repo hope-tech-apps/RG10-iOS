@@ -237,9 +237,9 @@ struct AccountMainView: View {
                     Spacer()
                 }
                 .padding(.vertical, 8)
-                .onTapGesture {
-                    navigationManager.navigate(to: .editProfile)
-                }
+//                .onTapGesture {
+//                    navigationManager.navigate(to: .editProfile)
+//                }
             }
             
             // Menu Items
@@ -253,15 +253,15 @@ struct AccountMainView: View {
 //                }
             }
             
-            Section("Settings") {
-                NavigationLink(value: NavigationDestination.settings) {
-                    Label("Settings", systemImage: "gear")
-                }
-                
-                NavigationLink(value: NavigationDestination.support) {
-                    Label("Help & Support", systemImage: "questionmark.circle")
-                }
-            }
+//            Section("Settings") {
+//                NavigationLink(value: NavigationDestination.settings) {
+//                    Label("Settings", systemImage: "gear")
+//                }
+//                
+//                NavigationLink(value: NavigationDestination.support) {
+//                    Label("Help & Support", systemImage: "questionmark.circle")
+//                }
+//            }
             
             Section("Legal") {
                 NavigationLink(value: NavigationDestination.termsOfService) {
