@@ -83,3 +83,8 @@ class AppCoordinator: ObservableObject {
             .store(in: &cancellables)
     }
 }
+
+// MARK: - Notification Names
+extension Notification.Name {
+    static let showLogin = Notification.Name("showLogin")
+}
