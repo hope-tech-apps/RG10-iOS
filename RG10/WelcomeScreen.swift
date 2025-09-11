@@ -5,11 +5,10 @@
 //  Created by Moneeb Sayed on 7/4/25.
 //
 
-
 import SwiftUI
 
 struct WelcomeScreen: View {
-    @EnvironmentObject var coordinator: AppCoordinator
+    @Binding var showWelcome: Bool
     
     var body: some View {
         ZStack {
@@ -46,16 +45,22 @@ struct WelcomeScreen: View {
             }
         }
         .onTapGesture {
-            coordinator.navigateToHome()
+            navigateToHome()
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + AppConstants.Timing.welcomeScreenDuration) {
-                coordinator.navigateToHome()
+                navigateToHome()
             }
+        }
+    }
+    
+    private func navigateToHome() {
+        withAnimation {
+            showWelcome = false
         }
     }
 }
 
-#Preview {
-    WelcomeScreen()
-}
+//#Preview {
+//    WelcomeScreen()
+//}

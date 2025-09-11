@@ -6,10 +6,16 @@
 //
 
 
+//
+//  LoadingScreen.swift
+//  RG10
+//
+
 import SwiftUI
 
 struct LoadingScreen: View {
-    @EnvironmentObject var coordinator: AppCoordinator
+    @Binding var showLoading: Bool
+    @Binding var showWelcome: Bool
     @State private var isAnimating = false
     
     var body: some View {
@@ -43,14 +49,15 @@ struct LoadingScreen: View {
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + AppConstants.Timing.loadingScreenDuration) {
-                withAnimation(AppConstants.CurveAnimation.defaultCurve) {
-                    coordinator.navigateToWelcome()
+                withAnimation {
+                    showLoading = false
+                    showWelcome = true
                 }
             }
         }
     }
 }
 
-#Preview {
-    LoadingScreen()
-}
+//#Preview {
+//    LoadingScreen()
+//}

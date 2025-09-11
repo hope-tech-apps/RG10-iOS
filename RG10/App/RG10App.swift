@@ -6,23 +6,35 @@
 //
 
 import SwiftUI
-import GoogleSignIn
 
 @main
 struct RG10App: App {
-    @StateObject private var appCoordinator = AppCoordinator()
+    @StateObject private var navigationManager = NavigationManager.shared
     @StateObject private var authManager = AuthManager.shared
-
+    @State private var showLoading = true
+    @State private var showWelcome = false
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(appCoordinator)
-                .environmentObject(authManager)
-                .preferredColorScheme(.light)
-                .onOpenURL { url in
-                    GIDSignIn.sharedInstance.handle(url)
+            ZStack {
+                if showLoading {
+                    LoadingScreen(
+                        showLoading: $showLoading,
+                        showWelcome: $showWelcome
+                    )
+                    .transition(.opacity)
+                } else if showWelcome {
+                    WelcomeScreen(showWelcome: $showWelcome)
+                        .transition(.opacity)
+                } else {
+                    MainTabView()
+                        .environmentObject(navigationManager)
+                        .environmentObject(authManager)
                 }
-
+            }
+            .preferredColorScheme(.light)
+            .animation(.easeInOut(duration: 0.5), value: showLoading)
+            .animation(.easeInOut(duration: 0.5), value: showWelcome)
         }
     }
 }
