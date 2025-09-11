@@ -15,13 +15,26 @@ struct StaffSelectorTabs: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 16) {
                 ForEach(Array(staffMembers.enumerated()), id: \.element.id) { index, member in
-                    StaffTab(
-                        name: member.name,
-                        position: member.position,
-                        isSelected: index == selectedIndex
-                    ) {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            selectedIndex = index
+                    if #available(iOS 26.0, *) {
+                        GlassStaffTab(
+                            name: member.name,
+                            position: member.position,
+                            isSelected: index == selectedIndex
+                        ) {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                selectedIndex = index
+                            }
+                        }
+                    } else {
+                        // Fallback on earlier versions
+                        StaffTab(
+                            name: member.name,
+                            position: member.position,
+                            isSelected: index == selectedIndex
+                        ) {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                selectedIndex = index
+                            }
                         }
                     }
                 }

@@ -11,7 +11,7 @@ struct WelcomeScreen: View {
     @Binding var showWelcome: Bool
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomLeading) {
             Image(AppConstants.Images.soccerBackground)
                 .resizable()
                 .scaledToFill()
@@ -27,22 +27,19 @@ struct WelcomeScreen: View {
             )
             .ignoresSafeArea()
             
-            VStack {
+            VStack(alignment: .leading, spacing: 0) {
                 Spacer()
                 
                 Image(AppConstants.Images.logoColor)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 180, height: 70)
-                
+                    .frame(width: 167, height: 117)
+
                 Text(LocalizedStrings.welcomeTitle)
                     .font(.system(size: AppConstants.Fonts.titleSize, weight: .bold))
                     .foregroundColor(.white)
-                    .padding(.top, AppConstants.Spacing.medium)
-                
-                Spacer()
-                    .frame(height: 100)
             }
+            .padding()
         }
         .onTapGesture {
             navigateToHome()

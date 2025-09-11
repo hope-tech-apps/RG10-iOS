@@ -19,10 +19,9 @@ class TrainingViewModel: ObservableObject {
     // MARK: - Private Properties
     private var cancellables = Set<AnyCancellable>()
     private let userDefaults = UserDefaults.standard
-    
-    // MARK: - Constants
-    let registrationURL = "https://www.oasyssports.com/RG10Football/global-login.cfm"
-    
+    private let navigationManager = NavigationManager.shared
+    private let registrationURL = "https://www.oasyssports.com/RG10Football/global-login.cfm"
+
     // MARK: - Initialization
     init() {
         self.isPremium = userDefaults.bool(forKey: "isPremium")
@@ -44,20 +43,20 @@ class TrainingViewModel: ObservableObject {
     private func loadCamps() {
         // In a real app, this would fetch from an API or database
         // For now, using static data
-        availableCamps = [
-            CampData(
-                image: AppConstants.Images.campOne,
-                title: "2025 Spring Break\nSoccer Camp",
-                dates: "April 14th - 18th, 2025",
-                hasCheckmark: false
-            ),
-            CampData(
-                image: AppConstants.Images.soccerBackground,
-                title: "2025 Spring Break\nSoccer Camp",
-                dates: "April 14th - 18th, 2025",
-                hasCheckmark: false
-            )
-        ]
+//        availableCamps = [
+//            CampData(
+//                image: AppConstants.Images.campOne,
+//                title: "2025 Spring Break\nSoccer Camp",
+//                dates: "April 14th - 18th, 2025",
+//                hasCheckmark: false
+//            ),
+//            CampData(
+//                image: AppConstants.Images.soccerBackground,
+//                title: "2025 Spring Break\nSoccer Camp",
+//                dates: "April 14th - 18th, 2025",
+//                hasCheckmark: false
+//            )
+//        ]
         
         // Uncomment to test empty state
         // availableCamps = []
@@ -69,11 +68,11 @@ class TrainingViewModel: ObservableObject {
             UIApplication.shared.open(url)
         }
     }
-    
+        
     func openTrainingPackages() {
-        showTrainingPackages = true
+        navigationManager.navigate(to: .trainingPackages, in: .training)
     }
-    
+
     func openUpgradeSheet() {
         showUpgradeSheet = true
     }

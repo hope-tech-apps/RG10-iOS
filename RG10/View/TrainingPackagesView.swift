@@ -105,10 +105,10 @@ struct PackageCard: View {
                     
                     Spacer()
                     
-                    Image(systemName: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                    Image(systemName: isExpanded ? "chevron.right.circle.fill" : "chevron.right.circle.fill")
                         .font(.system(size: 24))
                         .foregroundColor(.white)
-                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
                 }
                 .padding(20)
                 .background(

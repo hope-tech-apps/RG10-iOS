@@ -42,7 +42,8 @@ struct AccountMainView: View {
                 NavigationLink(value: NavigationDestination.myAppointments) {
                     Label("My Appointments", systemImage: "calendar")
                 }
-                
+                .foregroundStyle(AppConstants.Colors.primaryRed)
+
 //                NavigationLink(value: NavigationDestination.paymentHistory) {
 //                    Label("Payment History", systemImage: "creditcard")
 //                }
@@ -62,10 +63,12 @@ struct AccountMainView: View {
                 NavigationLink(value: NavigationDestination.termsOfService) {
                     Label("Terms of Service", systemImage: "doc.text")
                 }
-                
+                .foregroundStyle(AppConstants.Colors.primaryRed)
+
                 NavigationLink(value: NavigationDestination.privacyPolicy) {
                     Label("Privacy Policy", systemImage: "lock.doc")
                 }
+                .foregroundStyle(AppConstants.Colors.primaryRed)
             }
             
             Section {

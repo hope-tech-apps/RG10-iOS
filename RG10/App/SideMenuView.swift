@@ -67,7 +67,7 @@ struct SideMenuView: View {
                     Group {
                         MenuRowView(
                             title: "Explore Trainings",
-                            icon: Icons.exploreTrainings,
+                            icon: Icons.compass,
                             action: {
                                 isShowing = false
                                 navigationManager.navigate(to: .trainingPackages, in: .home)
@@ -76,7 +76,7 @@ struct SideMenuView: View {
                         
                         MenuRowView(
                             title: "Watch Videos",
-                            icon: Icons.watchVideos,
+                            icon: Icons.play,
                             action: {
                                 isShowing = false
                                 navigationManager.navigate(to: .videoLibrary, in: .home)
@@ -103,7 +103,7 @@ struct SideMenuView: View {
                         
                         MenuRowView(
                             title: "Merch Store",
-                            icon: Icons.merchStore,
+                            icon: Icons.cart,
                             action: {
                                 isShowing = false
                                 navigationManager.navigate(to: .merchandise, in: .home)
@@ -117,7 +117,7 @@ struct SideMenuView: View {
                         
                         MenuRowView(
                             title: "Book a Session",
-                            icon: Icons.bookSession,
+                            icon: Icons.bookmark,
                             action: {
                                 isShowing = false
                                 showingBookingWebView = true
@@ -135,7 +135,7 @@ struct SideMenuView: View {
                         
                         MenuRowView(
                             title: "My Plans",
-                            icon: Icons.myPlans,
+                            icon: Icons.rocket,
                             action: {
                                 isShowing = false
                                 navigationManager.navigate(to: .myPlans, in: .account)
@@ -158,7 +158,7 @@ struct SideMenuView: View {
                         
                         MenuRowView(
                             title: "Terms of Service",
-                            icon: Icons.termsOfService,
+                            icon: Icons.shield,
                             action: {
                                 isShowing = false
                                 navigationManager.navigate(to: .termsOfService, in: .home)

@@ -81,7 +81,6 @@ struct ExploreView: View {
             }
         }
         .background(Color.white)
-        .navigationBarHidden(true) // Hide the default nav bar since we have custom one
     }
 }
 

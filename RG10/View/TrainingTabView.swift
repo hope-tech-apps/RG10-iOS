@@ -7,25 +7,22 @@
 
 import SwiftUI
 
-// MARK: - Main Training Tab View
 struct TrainingTabView: View {
     @StateObject private var viewModel = TrainingViewModel()
+    @EnvironmentObject var navigationManager: NavigationManager
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                ScrollView(showsIndicators: false) {
-                    if viewModel.isPremium {
-                        PremiumTrainingContent()
-                            .environmentObject(viewModel)
-                    } else {
-                        NonPremiumTrainingContent()
-                            .environmentObject(viewModel)
-                    }
+        VStack(spacing: 0) {
+            ScrollView(showsIndicators: false) {
+                if viewModel.isPremium {
+                    PremiumTrainingContent()
+                        .environmentObject(viewModel)
+                } else {
+                    NonPremiumTrainingContent()
+                        .environmentObject(viewModel)
                 }
-                .background(Color(UIColor.systemGray6))
             }
-            .navigationBarHidden(true)
+            .background(Color(UIColor.systemGray6))
         }
         .sheet(isPresented: $viewModel.showUpgradeSheet) {
             PremiumUpgradeSheet()
@@ -34,7 +31,7 @@ struct TrainingTabView: View {
     }
 }
 
-// MARK: - Non-Premium Content View
+// Update NonPremiumTrainingContent - remove fullScreenCover
 struct NonPremiumTrainingContent: View {
     @EnvironmentObject var viewModel: TrainingViewModel
     
@@ -81,12 +78,9 @@ struct NonPremiumTrainingContent: View {
             TrainingFooterView()
                 .environmentObject(viewModel)
         }
-        .fullScreenCover(isPresented: $viewModel.showTrainingPackages) {
-            TrainingPackagesView()
-        }
+        // Removed fullScreenCover - navigation now handled by NavigationManager
     }
 }
-
 // MARK: - Premium Content View
 struct PremiumTrainingContent: View {
     @EnvironmentObject var viewModel: TrainingViewModel
@@ -101,22 +95,23 @@ struct PremiumTrainingContent: View {
                     .padding(.top, 20)
                 
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        CampCard(
-                            image: "camp_soccer_ball",
-                            title: "2025 Spring Break\nSoccer Camp",
-                            dates: "April 14th - 18th, 2025",
-                            hasCheckmark: true
-                        )
-                        
-                        CampCard(
-                            image: "camp_player",
-                            title: "2025 Spring Break\nSoccer Camp",
-                            dates: "April 14th - 18th, 2025",
-                            hasCheckmark: false
-                        )
-                    }
-                    .padding(.horizontal)
+                    EmptyCampsView()
+                    //                    HStack(spacing: 12) {
+//                        CampCard(
+//                            image: "camp_soccer_ball",
+//                            title: "2025 Spring Break\nSoccer Camp",
+//                            dates: "April 14th - 18th, 2025",
+//                            hasCheckmark: true
+//                        )
+//                        
+//                        CampCard(
+//                            image: "camp_player",
+//                            title: "2025 Spring Break\nSoccer Camp",
+//                            dates: "April 14th - 18th, 2025",
+//                            hasCheckmark: false
+//                        )
+//                    }
+//                    .padding(.horizontal)
                 }
                 
                 // Page Indicators
@@ -213,22 +208,22 @@ struct EmptyCampsView: View {
                     .padding(.horizontal, 40)
             }
             
-            // Notification button
-            Button(action: viewModel.requestCampNotification) {
-                HStack {
-                    Image(systemName: "bell")
-                        .font(.system(size: 14))
-                    Text("Notify Me")
-                        .font(.system(size: 14, weight: .medium))
-                }
-                .foregroundColor(AppConstants.Colors.primaryRed)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(AppConstants.Colors.primaryRed, lineWidth: 1)
-                )
-            }
+//            // Notification button
+//            Button(action: viewModel.requestCampNotification) {
+//                HStack {
+//                    Image(systemName: "bell")
+//                        .font(.system(size: 14))
+//                    Text("Notify Me")
+//                        .font(.system(size: 14, weight: .medium))
+//                }
+//                .foregroundColor(AppConstants.Colors.primaryRed)
+//                .padding(.horizontal, 20)
+//                .padding(.vertical, 10)
+//                .background(
+//                    RoundedRectangle(cornerRadius: 20)
+//                        .stroke(AppConstants.Colors.primaryRed, lineWidth: 1)
+//                )
+//            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)

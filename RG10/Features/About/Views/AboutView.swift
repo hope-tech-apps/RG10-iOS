@@ -56,7 +56,6 @@ struct AboutView: View {
                 }
             }
             .ignoresSafeArea(edges: .top)
-            .navigationBarHidden(true)
         }
     }
 }
