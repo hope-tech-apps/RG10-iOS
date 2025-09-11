@@ -85,6 +85,6 @@ struct GlassStaffTab: View {
             )
         }
         .buttonStyle(PlainButtonStyle())
-        .glassEffect()
+//        .glassEffect()
     }
 }
