@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - Register Response
 struct RegisterResponse: Codable {
     let success: Bool
     let message: String

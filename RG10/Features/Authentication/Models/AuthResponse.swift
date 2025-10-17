@@ -5,10 +5,9 @@
 //  Created by Moneeb Sayed on 9/10/25.
 //
 
-import SwiftUI
 import Foundation
 
-// MARK: - Auth Response
+// MARK: - Auth Response (Compatible with both systems)
 struct AuthResponse: Codable {
     let token: String
     let userEmail: String

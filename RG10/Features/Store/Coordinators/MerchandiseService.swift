@@ -10,17 +10,16 @@ import Supabase
 import SwiftUI
 import Combine
 
-// MARK: - Supabase Service
+// MARK: - Merchandise Service
 class MerchandiseService: ObservableObject {
     static let shared = MerchandiseService()
     
-    private let client = SupabaseClient(
-        supabaseURL: URL(string: "https://uwssjvqlsekveqvdkdnj.supabase.co")!,
-        supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3c3NqdnFsc2VrdmVxdmRrZG5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyMTU5OTksImV4cCI6MjA3Mjc5MTk5OX0.HG6t79U5z8w_f0Qfwgclkxs4aZOfgALbMEwXN9ZTA00",
-        options: SupabaseClientOptions(db: .init(schema: "rg10"))
-    )
+    // Use the centralized client instead of creating a new one
+    private let client = SupabaseClientManager.shared.client
     
-    // MARK: - Fetch All Products (Fixed)
+    private init() {}
+    
+    // MARK: - Fetch All Products
     func fetchProducts() async throws -> [Merchandise] {
         let response = try await client
             .from("products")
@@ -33,7 +32,7 @@ class MerchandiseService: ObservableObject {
         return products
     }
     
-    // Rest of the methods remain the same...
+    // MARK: - Fetch Product Sizes
     func fetchProductSizes(for productId: Int) async throws -> [SizeDetail] {
         let productSizesResponse = try await client
             .from("product_sizes")
@@ -85,6 +84,7 @@ class MerchandiseService: ObservableObject {
         return sizeDetails
     }
     
+    // MARK: - Fetch Categories
     func fetchCategories() async throws -> [Category] {
         let response = try await client
             .from("categories")

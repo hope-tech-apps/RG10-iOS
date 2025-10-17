@@ -8,6 +8,7 @@
 
 import Foundation
 
+// MARK: - Register Data
 struct RegisterData: Codable {
     let userId: Int
     let username: String
@@ -19,4 +20,3 @@ struct RegisterData: Codable {
         case email
     }
 }
-

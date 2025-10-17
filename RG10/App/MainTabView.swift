@@ -59,7 +59,7 @@ struct MainTabView: View {
                 // Book Tab
                 if availableTabs.contains(.book) {
                     NavigationStack(path: $navigationManager.bookPath) {
-                        BookTabView()
+                        BookingView()
                             .navigationBarSetup(showingSideMenu: $showingSideMenu)
                             .navigationDestination(for: NavigationDestination.self) { destination in
                                 NavigationDestinationView(destination: destination)

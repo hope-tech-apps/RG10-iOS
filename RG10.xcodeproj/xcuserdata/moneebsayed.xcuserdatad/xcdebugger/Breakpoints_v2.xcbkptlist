@@ -36,5 +36,95 @@
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E883D94A-B969-4602-8EBF-0841DE960DD4"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RG10/Features/Booking/Services/BookingService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
+            landmarkName = "fetchBookings(email:status:page:take:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "E883D94A-B969-4602-8EBF-0841DE960DD4 - cd3472313a7ccecb"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for RG10.BookingService.fetchBookings(email: Swift.Optional&lt;Swift.String&gt;, status: Swift.Optional&lt;RG10.BookingStatus&gt;, page: Swift.Int, take: Swift.Int) async throws -&gt; Swift.Array&lt;RG10.Booking&gt;"
+                  moduleName = "RG10.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/moneebsayed/Developer/RG10/RG10/Features/Booking/Services/BookingService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "70"
+                  endingLineNumber = "70">
+               </Location>
+               <Location
+                  uuid = "E883D94A-B969-4602-8EBF-0841DE960DD4 - a01cec502cf5fb0d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(6) await resume partial function for RG10.BookingService.fetchBookings(email: Swift.Optional&lt;Swift.String&gt;, status: Swift.Optional&lt;RG10.BookingStatus&gt;, page: Swift.Int, take: Swift.Int) async throws -&gt; Swift.Array&lt;RG10.Booking&gt;"
+                  moduleName = "RG10.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/moneebsayed/Developer/RG10/RG10/Features/Booking/Services/BookingService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "70"
+                  endingLineNumber = "70">
+               </Location>
+               <Location
+                  uuid = "E883D94A-B969-4602-8EBF-0841DE960DD4 - 84f32bc94bd6d21c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(13) suspend resume partial function for RG10.BookingService.fetchBookings(email: Swift.Optional&lt;Swift.String&gt;, status: Swift.Optional&lt;RG10.BookingStatus&gt;, page: Swift.Int, take: Swift.Int) async throws -&gt; Swift.Array&lt;RG10.Booking&gt;"
+                  moduleName = "RG10.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/moneebsayed/Developer/RG10/RG10/Features/Booking/Services/BookingService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "70"
+                  endingLineNumber = "70">
+               </Location>
+               <Location
+                  uuid = "E883D94A-B969-4602-8EBF-0841DE960DD4 - 718058bf25fdf793"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(14) suspend resume partial function for RG10.BookingService.fetchBookings(email: Swift.Optional&lt;Swift.String&gt;, status: Swift.Optional&lt;RG10.BookingStatus&gt;, page: Swift.Int, take: Swift.Int) async throws -&gt; Swift.Array&lt;RG10.Booking&gt;"
+                  moduleName = "RG10.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/moneebsayed/Developer/RG10/RG10/Features/Booking/Services/BookingService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "70"
+                  endingLineNumber = "70">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7ED9AD34-AE30-44C3-A9F8-4766ED79908F"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RG10/Features/Booking/Services/BookingService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "84"
+            endingLineNumber = "84"
+            landmarkName = "fetchBookings(email:status:page:take:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

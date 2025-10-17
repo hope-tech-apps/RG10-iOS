@@ -7,81 +7,185 @@
 
 import Foundation
 import Combine
+import Supabase
 
-// MARK: - Auth Manager
+// MARK: - Auth Manager (Supabase)
 class AuthManager: ObservableObject {
     @Published var isAuthenticated = false
     @Published var currentUser: User?
-    
-    private let tokenKey = "authToken"
-    private let userKey = "currentUser"
+    @Published var session: Session?
     
     static let shared = AuthManager()
+    private let client = SupabaseClientManager.shared.client
+    private var authStateChangeListener: Task<Void, Never>?
     
     private init() {
-        loadStoredAuth()
+        setupAuthListener()
+        checkCurrentSession()
     }
     
-    // MARK: - Token Management
-    var authToken: String? {
-        get { UserDefaults.standard.string(forKey: tokenKey) }
-        set {
-            UserDefaults.standard.set(newValue, forKey: tokenKey)
-            isAuthenticated = newValue != nil
-        }
+    deinit {
+        authStateChangeListener?.cancel()
     }
     
-    // MARK: - User Management
-    func saveUser(from authResponse: AuthResponse) {
-        let user = User(
-            id: 0, // We don't get ID from login response
-            username: authResponse.userNicename,
-            email: authResponse.userEmail,
-            displayName: authResponse.userDisplayName
-        )
-        
-        currentUser = user
-        authToken = authResponse.token
-        
-        // Persist user data
-        if let encoded = try? JSONEncoder().encode(user) {
-            UserDefaults.standard.set(encoded, forKey: userKey)
-        }
-    }
-    
-    func saveUser(from registerData: RegisterData) {
-        let user = User(
-            id: registerData.userId,
-            username: registerData.username,
-            email: registerData.email,
-            displayName: registerData.username
-        )
-        
-        currentUser = user
-        
-        // Persist user data
-        if let encoded = try? JSONEncoder().encode(user) {
-            UserDefaults.standard.set(encoded, forKey: userKey)
-        }
-    }
-    
-    // MARK: - Auth State
-    private func loadStoredAuth() {
-        if let token = authToken, !token.isEmpty {
-            isAuthenticated = true
-            
-            // Load stored user
-            if let userData = UserDefaults.standard.data(forKey: userKey),
-               let user = try? JSONDecoder().decode(User.self, from: userData) {
-                currentUser = user
+    // MARK: - Auth State Listener
+    private func setupAuthListener() {
+        authStateChangeListener = Task {
+            for await (event, session) in client.auth.authStateChanges {
+                await MainActor.run {
+                    switch event {
+                    case .signedIn:
+                        self.session = session
+                        self.isAuthenticated = true
+                        self.loadUserProfile()
+                        
+                    case .signedOut:
+                        self.session = nil
+                        self.currentUser = nil
+                        self.isAuthenticated = false
+                        UserDefaults.standard.removeObject(forKey: "userEmail")
+                        
+                    case .tokenRefreshed:
+                        self.session = session
+                        
+                    case .userUpdated:
+                        self.loadUserProfile()
+                        
+                    default:
+                        break
+                    }
+                }
             }
         }
     }
     
+    // MARK: - Session Management
+    private func checkCurrentSession() {
+        Task {
+            do {
+                let session = try await client.auth.session
+                await MainActor.run {
+                    self.session = session
+                    self.isAuthenticated = true
+                    self.loadUserProfile()
+                }
+            } catch {
+                await MainActor.run {
+                    self.isAuthenticated = false
+                }
+            }
+        }
+    }
+    
+    // MARK: - User Profile
+    private func loadUserProfile() {
+        guard let supabaseUser = client.auth.currentUser else { return }
+        
+        // Store email for booking service
+        if let email = supabaseUser.email {
+            UserDefaults.standard.set(email, forKey: "userEmail")
+        }
+        
+        // Extract username from metadata
+        var username = supabaseUser.email?.components(separatedBy: "@").first ?? "User"
+        var displayName = username
+
+        if let metadata = supabaseUser.userMetadata as? [String: AnyJSON] {
+            if case let .string(uname) = metadata["username"] {
+                username = uname
+            }
+            if case let .string(dname) = metadata["display_name"] {
+                displayName = dname
+            }
+        }
+        
+        // Convert Supabase User to our User model
+        currentUser = User(
+            id: supabaseUser.id.uuidString.hashValue, // Convert UUID to Int for compatibility
+            username: username,
+            email: supabaseUser.email ?? "",
+            displayName: displayName
+        )
+    }
+    
+    // MARK: - Auth Methods
+    func signIn(email: String, password: String) async throws {
+        let session = try await client.auth.signIn(
+            email: email,
+            password: password
+        )
+        
+        await MainActor.run {
+            self.session = session
+            self.isAuthenticated = true
+            self.loadUserProfile()
+        }
+    }
+    
+    func signUp(email: String, password: String, username: String) async throws {
+        let response = try await client.auth.signUp(
+            email: email,
+            password: password,
+            data: [
+                "username": AnyJSON.string(username),
+                "display_name": AnyJSON.string(username)
+            ]
+        )
+        
+        if let session = response.session {
+            await MainActor.run {
+                self.session = session
+                self.isAuthenticated = true
+                self.loadUserProfile()
+            }
+        }
+        
+        // Note: Depending on your Supabase settings, user might need to confirm email
+        // Check response.user?.confirmedAt to see if email confirmation is required
+    }
+    
+    func signOut() async throws {
+        try await client.auth.signOut()
+        
+        await MainActor.run {
+            self.session = nil
+            self.currentUser = nil
+            self.isAuthenticated = false
+            UserDefaults.standard.removeObject(forKey: "userEmail")
+        }
+    }
+    
+    func resetPassword(email: String) async throws {
+        try await client.auth.resetPasswordForEmail(email)
+    }
+    
+    func updatePassword(newPassword: String) async throws {
+        // The Supabase Swift SDK doesn't currently support direct password updates
+        // from an authenticated session. For password changes, users should:
+        // 1. Use the password reset flow (resetPasswordForEmail)
+        // 2. Or sign out and use "Forgot Password"
+        
+        // For security, most apps require the current password anyway
+        // So the recommended approach is to use the reset password flow
+        
+        // If you need this functionality, you can:
+        // Option 1: Trigger a password reset email
+        if let email = currentUser?.email {
+            try await resetPassword(email: email)
+            throw AuthError.registrationFailed("Password reset email sent. Please check your email to update your password.")
+        } else {
+            throw AuthError.registrationFailed("Unable to update password. Please sign out and use 'Forgot Password'.")
+        }
+    }
+    
+    // Alternative method if you want to remove password update functionality entirely:
+    // Just comment out this method and handle password changes through the reset flow
+    
+    // MARK: - Compatibility Methods (for existing code)
     func logout() {
-        authToken = nil
-        currentUser = nil
-        UserDefaults.standard.removeObject(forKey: userKey)
-        isAuthenticated = false
+        Task {
+            try? await signOut()
+        }
     }
 }
+

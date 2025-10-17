@@ -17,13 +17,15 @@ class ExploreViewModel: ObservableObject {
             name: "Rodrigo Gudino",
             role: "Head Coach & CEO",
             imageURL: "https://www.rg10football.com/wp-content/uploads/2025/07/207C2DC5-1B43-48C0-BEA2-C436CCBC45F1.jpeg",
-            cardImageURL: nil
+            cardImageURL: nil,
+            scheduleLink: "https://www.cal.com/hopetechapps/rodrigo-trainings"
         ),
         Coach(
             name: "Aryan Kamdar",
             role: "RG10 Coach (Chicago)",
             imageURL: "https://www.rg10football.com/wp-content/uploads/2025/07/Aryan2-683x1024.jpeg",
-            cardImageURL: nil
+            cardImageURL: nil,
+            scheduleLink: "https://www.cal.com/hopetechapps/ayran-trainings"
         )
     ]
     

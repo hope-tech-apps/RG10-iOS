@@ -6,18 +6,21 @@
 //
 
 import Foundation
+import Supabase
 
 // MARK: - User Model
-struct User: Codable, Equatable {
+struct User: Codable, Identifiable {
     let id: Int
     let username: String
     let email: String
-    let displayName: String?
+    let displayName: String
     
-    enum CodingKeys: String, CodingKey {
-        case id = "user_id"
-        case username = "user_nicename"
-        case email = "user_email"
-        case displayName = "user_display_name"
+    // For Supabase UUID compatibility
+    var supabaseId: String? {
+        return client.auth.currentUser?.id.uuidString
+    }
+    
+    private var client: SupabaseClient {
+        SupabaseClientManager.shared.client
     }
 }

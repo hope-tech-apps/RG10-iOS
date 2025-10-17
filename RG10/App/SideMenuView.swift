@@ -197,7 +197,7 @@ struct SideMenuView: View {
         .frame(maxWidth: .infinity)
         .background(Color.white)
         .sheet(isPresented: $showingBookingWebView) {
-            BookingWebView()
+            BookingView()
         }
     }
 }

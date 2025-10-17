@@ -15,6 +15,7 @@ struct Coach: Identifiable, Hashable {
     let role: String
     let imageURL: String
     let cardImageURL: String?
+    let scheduleLink: String?
     
     // Hashable conformance
     func hash(into hasher: inout Hasher) {
