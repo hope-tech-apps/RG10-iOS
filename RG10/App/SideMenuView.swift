@@ -111,39 +111,7 @@ struct SideMenuView: View {
                         )
                     }
                     
-                    // User Section (if authenticated)
-                    if authManager.isAuthenticated {
-                        SectionDivider()
-                        
-                        MenuRowView(
-                            title: "Book a Session",
-                            icon: Icons.bookmark,
-                            action: {
-                                isShowing = false
-                                showingBookingWebView = true
-                            }
-                        )
-                        
-                        MenuRowView(
-                            title: "My Appointments",
-                            icon: Icons.myAppointments,
-                            action: {
-                                isShowing = false
-                                navigationManager.navigate(to: .myAppointments, in: .account)
-                            }
-                        )
-                        
-                        MenuRowView(
-                            title: "My Plans",
-                            icon: Icons.rocket,
-                            action: {
-                                isShowing = false
-                                navigationManager.navigate(to: .myPlans, in: .account)
-                            }
-                        )
-                    }
-                    
-                    SectionDivider()
+                    // User Section removed - no longer needed
                     
                     // About Section
                     Group {
@@ -197,7 +165,7 @@ struct SideMenuView: View {
         .frame(maxWidth: .infinity)
         .background(Color.white)
         .sheet(isPresented: $showingBookingWebView) {
-            BookingView()
+            BookingFlowView()
         }
     }
 }

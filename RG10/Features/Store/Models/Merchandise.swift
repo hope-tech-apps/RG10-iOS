@@ -36,3 +36,31 @@ struct Merchandise: Codable, Hashable {
         lhs.id == rhs.id
     }
 }
+
+// MARK: - Merchandise WebView Configuration
+
+struct MerchandiseWebViewConfig: Sendable {
+    let url: String
+    let productName: String
+    let selectedSize: String
+    let quantity: Int
+    let allowedHosts: [String]
+    let successUrlPattern: String
+    
+    init(url: String, productName: String, selectedSize: String, quantity: Int) {
+        self.url = url
+        self.productName = productName
+        self.selectedSize = selectedSize
+        self.quantity = quantity
+        self.allowedHosts = [
+            "buy.stripe.com",
+            "checkout.stripe.com",
+            "js.stripe.com",
+            "hooks.stripe.com",
+            "m.stripe.com",
+            "pay.stripe.com",
+            "stripe.com"
+        ]
+        self.successUrlPattern = "success"
+    }
+}

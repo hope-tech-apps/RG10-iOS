@@ -37,17 +37,7 @@ struct AccountMainView: View {
 //                }
             }
             
-            // Menu Items
-            Section("Training") {
-                NavigationLink(value: NavigationDestination.myAppointments) {
-                    Label("My Appointments", systemImage: "calendar")
-                }
-                .foregroundStyle(AppConstants.Colors.primaryRed)
-
-//                NavigationLink(value: NavigationDestination.paymentHistory) {
-//                    Label("Payment History", systemImage: "creditcard")
-//                }
-            }
+            // Training section removed - no longer needed
             
 //            Section("Settings") {
 //                NavigationLink(value: NavigationDestination.settings) {

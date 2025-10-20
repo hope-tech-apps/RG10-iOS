@@ -1,17 +1,17 @@
 //
-//  BookingWebView.swift
+//  MerchandiseWebView.swift
 //  RG10
 //
-//  Created by Moneeb Sayed on 9/17/25.
+//  Created by Moneeb Sayed on 1/17/25.
 //
 
 import SwiftUI
 import WebKit
 
-// MARK: - Modern SwiftUI WebView
+// MARK: - Merchandise WebView
 
-struct BookingWebView: View {
-    let config: WebViewConfig
+struct MerchandiseWebView: View {
+    let config: MerchandiseWebViewConfig
     let onSuccessUrlDetected: ([String: String]) -> Void // All query parameters
     let onDismiss: () -> Void
     
@@ -24,67 +24,68 @@ struct BookingWebView: View {
         NavigationView {
             ZStack {
                 // WebView
-                WebViewRepresentable(
+                MerchandiseWebViewRepresentable(
                     url: URL(string: config.url)!,
                     isLoading: $isLoading,
                     progress: $progress,
-                    onSuccessUrlDetected: { bookingUid in
-                        onSuccessUrlDetected(bookingUid)
+                    onSuccessUrlDetected: { queryParams in
+                        onSuccessUrlDetected(queryParams)
                     },
                     onError: { error in
                         errorMessage = error
                         showingError = true
                     },
                     allowedHosts: config.allowedHosts,
-                    successUrlPattern: config.successUrlPattern,
-                    bookingUidQueryKey: config.bookingUidQueryKey
+                    successUrlPattern: config.successUrlPattern
                 )
                 .onAppear {
-                    print("🔗 Loading URL: \(config.url)")
+                    print("🛒 Loading merchandise checkout URL: \(config.url)")
                 }
                 
                 // Loading Overlay
                 if isLoading {
-                    VStack(spacing: 16) {
-                        ProgressView(value: progress)
-                            .progressViewStyle(LinearProgressViewStyle())
-                            .frame(width: 200)
+                    VStack(spacing: 20) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppConstants.Colors.primaryRed))
+                            .scaleEffect(1.5)
                         
-                        Text("Loading booking page...")
-                            .font(.caption)
+                        Text("Loading checkout...")
+                            .font(.headline)
                             .foregroundColor(.secondary)
+                        
+                        if progress > 0 {
+                            ProgressView(value: progress)
+                                .progressViewStyle(LinearProgressViewStyle(tint: AppConstants.Colors.primaryRed))
+                                .frame(width: 200)
+                        }
                     }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(12)
-                    .shadow(radius: 8)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(UIColor.systemBackground).opacity(0.9))
                 }
             }
-            .navigationTitle("Book Training Session")
+            .navigationTitle("Checkout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        onDismiss()
+                    Button(action: onDismiss) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.primary)
                     }
                 }
             }
         }
         .alert("Error", isPresented: $showingError) {
-            Button("OK") {
-                onDismiss()
-            }
+            Button("OK") { }
         } message: {
-            if let error = errorMessage {
-                Text(error)
-            }
+            Text(errorMessage ?? "Unknown error")
         }
     }
 }
 
-// MARK: - WebView Representable
+// MARK: - Merchandise WebView Representable
 
-struct WebViewRepresentable: UIViewRepresentable {
+struct MerchandiseWebViewRepresentable: UIViewRepresentable {
     let url: URL
     @Binding var isLoading: Bool
     @Binding var progress: Double
@@ -92,7 +93,6 @@ struct WebViewRepresentable: UIViewRepresentable {
     let onError: (String) -> Void
     let allowedHosts: [String]
     let successUrlPattern: String
-    let bookingUidQueryKey: String
     
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -119,9 +119,9 @@ struct WebViewRepresentable: UIViewRepresentable {
     }
     
     class Coordinator: NSObject, WKNavigationDelegate {
-        let parent: WebViewRepresentable
+        let parent: MerchandiseWebViewRepresentable
         
-        init(_ parent: WebViewRepresentable) {
+        init(_ parent: MerchandiseWebViewRepresentable) {
             self.parent = parent
         }
         
@@ -191,49 +191,26 @@ struct WebViewRepresentable: UIViewRepresentable {
                 }
             }
             
-            print("🔗 Extracted query parameters: \(params)")
+            print("🛒 Extracted merchandise checkout parameters: \(params)")
             return params
         }
         
-        private func extractBookingUid(from url: URL) -> String? {
-            guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-                  let queryItems = components.queryItems else { return nil }
-            
-            return queryItems.first { $0.name == parent.bookingUidQueryKey }?.value
-        }
-        
         private func isSuccessUrl(_ url: URL) -> Bool {
-            let urlString = url.absoluteString
-            return urlString.hasPrefix(parent.successUrlPattern)
+            let isSuccess = url.absoluteString.contains(parent.successUrlPattern)
+            print("🛒 Checking success URL: \(url.absoluteString) -> \(isSuccess)")
+            return isSuccess
         }
         
         private func isAllowedHost(_ url: URL) -> Bool {
-            guard let host = url.host else { return false }
-            return parent.allowedHosts.contains { allowedHost in
-                host == allowedHost || host.hasSuffix(".\(allowedHost)")
+            guard let host = url.host else { 
+                print("🛒 No host found for URL: \(url.absoluteString)")
+                return false 
             }
+            let isAllowed = parent.allowedHosts.contains { allowedHost in
+                host.contains(allowedHost)
+            }
+            print("🛒 Checking allowed host: \(host) -> \(isAllowed)")
+            return isAllowed
         }
-    }
-}
-
-// MARK: - Preview
-
-struct BookingWebView_Previews: PreviewProvider {
-    static var previews: some View {
-        BookingWebView(
-            config: WebViewConfig(
-                from: BookingFlowConfig(
-                    sessionType: .single,
-                    calBookingUrl: "https://cal.com/coach/single-session",
-                    calAllowedHosts: ["cal.com", "www.cal.com"],
-                    bookingRedirectHosts: ["rg10football.com"],
-                    bookingUidQueryKey: "uid",
-                    stripePriceId: "price_single",
-                    merchantDisplayName: "RG10 Football"
-                )
-            ),
-            onSuccessUrlDetected: { _ in },
-            onDismiss: { }
-        )
     }
 }

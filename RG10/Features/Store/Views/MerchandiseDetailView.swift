@@ -188,5 +188,20 @@ struct MerchandiseDetailView: View {
         } message: {
             Text("Payment link is not configured for this product.")
         }
+        .sheet(isPresented: $viewModel.showingWebView) {
+            if let config = viewModel.webViewConfig {
+                MerchandiseWebView(
+                    config: config,
+                    onSuccessUrlDetected: { queryParams in
+                        viewModel.handleCheckoutSuccess()
+                    },
+                    onDismiss: {
+                        viewModel.dismissWebView()
+                    }
+                )
+            } else {
+                EmptyView()
+            }
+        }
     }
 }

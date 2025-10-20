@@ -28,6 +28,7 @@ enum NavigationDestination: Hashable {
 
     // Training
     case trainingPackages
+    case subscriptionPlans
     case campDetail(CampData)
     case workoutDetail(String)
     
@@ -40,6 +41,7 @@ enum NavigationDestination: Hashable {
     case editProfile
     case myAppointments
     case paymentHistory
+    case subscriptionManagement
     case settings
     case support
 }

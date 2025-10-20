@@ -14,12 +14,14 @@ class TrainingViewModel: ObservableObject {
     @Published var isPremium: Bool
     @Published var showUpgradeSheet = false
     @Published var showTrainingPackages = false
+    @Published var showSubscriptionPlans = false
     @Published var availableCamps: [CampData] = []
     
     // MARK: - Private Properties
     private var cancellables = Set<AnyCancellable>()
     private let userDefaults = UserDefaults.standard
     private let navigationManager = NavigationManager.shared
+    private let subscriptionService = SubscriptionService.shared
     private let registrationURL = "https://www.oasyssports.com/RG10Football/global-login.cfm"
 
     // MARK: - Initialization
@@ -27,6 +29,9 @@ class TrainingViewModel: ObservableObject {
         self.isPremium = userDefaults.bool(forKey: "isPremium")
         loadCamps()
         setupBindings()
+        Task {
+            await checkSubscriptionStatus()
+        }
     }
     
     // MARK: - Private Methods
@@ -62,15 +67,30 @@ class TrainingViewModel: ObservableObject {
         // availableCamps = []
     }
     
+    func checkSubscriptionStatus() async {
+        do {
+            let userSubscription = try await subscriptionService.fetchUserSubscription()
+            await MainActor.run {
+                // Update premium status based on subscription
+                self.isPremium = userSubscription?.subscribed == true
+            }
+        } catch {
+            print("Failed to check subscription status: \(error)")
+        }
+    }
+    
     // MARK: - Public Methods
     func openRegistration() {
-        if let url = URL(string: registrationURL) {
-            UIApplication.shared.open(url)
-        }
+        // Navigate to subscription plans instead of external website
+        showSubscriptionPlans = true
     }
         
     func openTrainingPackages() {
         navigationManager.navigate(to: .trainingPackages, in: .training)
+    }
+    
+    func openSubscriptionPlans() {
+        showSubscriptionPlans = true
     }
 
     func openUpgradeSheet() {
@@ -83,6 +103,10 @@ class TrainingViewModel: ObservableObject {
     
     func dismissTrainingPackages() {
         showTrainingPackages = false
+    }
+    
+    func dismissSubscriptionPlans() {
+        showSubscriptionPlans = false
     }
     
     func togglePremium() {
@@ -155,18 +179,30 @@ class TrainingPackagesViewModel: ObservableObject {
     }
     
     func bookPackage(_ package: TrainingPackage) {
-        if let url = URL(string: registrationURL) {
-            UIApplication.shared.open(url)
-        }
+        // This method is now handled by the subscription flow
+        // The actual subscription purchase is handled by SubscriptionFlowViewModel
     }
     
     func signUpNow() {
-        if let url = URL(string: registrationURL) {
-            UIApplication.shared.open(url)
-        }
+        // This method is now handled by the subscription flow
+        // The actual subscription purchase is handled by SubscriptionFlowViewModel
     }
 }
 
+// MARK: - Training Package Model
+struct TrainingPackage: Identifiable {
+    let id: String
+    let title: String
+    let subtitle: String
+    let price: String
+    let sessions: String
+    let focus: String
+    let duration: String
+    let idealFor: String
+    let color: Color
+}
+
+// MARK: - Camp Data Model
 struct CampData: Identifiable, Hashable {
     let id = UUID()
     let image: String

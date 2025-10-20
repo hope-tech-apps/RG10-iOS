@@ -36,7 +36,9 @@ struct NavigationDestinationView: View {
                 
                 // Training destinations
             case .trainingPackages:
-                TrainingPackagesView()
+                UnifiedTrainingView()
+            case .subscriptionPlans:
+                SubscriptionPlansView()
             case .campDetail(let camp):
                 CampDetailView(camp: camp)
             case .workoutDetail(let workoutId):
@@ -57,6 +59,8 @@ struct NavigationDestinationView: View {
                 MyAppointmentsView()
             case .paymentHistory:
                 PaymentHistoryView()
+            case .subscriptionManagement:
+                SubscriptionManagementView()
             case .settings:
                 SettingsView()
             case .support:

@@ -8,26 +8,11 @@
 import SwiftUI
 
 struct TrainingTabView: View {
-    @StateObject private var viewModel = TrainingViewModel()
     @EnvironmentObject var navigationManager: NavigationManager
     
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView(showsIndicators: false) {
-                if viewModel.isPremium {
-                    PremiumTrainingContent()
-                        .environmentObject(viewModel)
-                } else {
-                    NonPremiumTrainingContent()
-                        .environmentObject(viewModel)
-                }
-            }
-            .background(Color(UIColor.systemGray6))
-        }
-        .sheet(isPresented: $viewModel.showUpgradeSheet) {
-            PremiumUpgradeSheet()
-                .environmentObject(viewModel)
-        }
+        UnifiedTrainingView()
+            .environmentObject(navigationManager)
     }
 }
 
@@ -179,123 +164,9 @@ struct CampsAndClinicsSection: View {
     }
 }
 
-// MARK: - Empty Camps View
-struct EmptyCampsView: View {
-    @EnvironmentObject var viewModel: TrainingViewModel
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            // Soccer ball icon with animation
-            ZStack {
-                Circle()
-                    .fill(Color.gray.opacity(0.1))
-                    .frame(width: 80, height: 80)
-                
-                Image(systemName: "soccerball")
-                    .font(.system(size: 40))
-                    .foregroundColor(AppConstants.Colors.primaryRed.opacity(0.6))
-            }
-            
-            VStack(spacing: 8) {
-                Text("Camps Coming Soon!")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.black)
-                
-                Text("We're preparing exciting soccer camps for you.\nCheck back soon for updates!")
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-            }
-            
-//            // Notification button
-//            Button(action: viewModel.requestCampNotification) {
-//                HStack {
-//                    Image(systemName: "bell")
-//                        .font(.system(size: 14))
-//                    Text("Notify Me")
-//                        .font(.system(size: 14, weight: .medium))
-//                }
-//                .foregroundColor(AppConstants.Colors.primaryRed)
-//                .padding(.horizontal, 20)
-//                .padding(.vertical, 10)
-//                .background(
-//                    RoundedRectangle(cornerRadius: 20)
-//                        .stroke(AppConstants.Colors.primaryRed, lineWidth: 1)
-//                )
-//            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
-        .padding(.horizontal)
-        .background(Color.white)
-        .cornerRadius(12)
-        .padding(.horizontal)
-    }
-}
+// EmptyCampsView is defined in UnifiedTrainingView.swift
 
-// MARK: - Camp Card Component
-struct CampCard: View {
-    let image: String
-    let title: String
-    let dates: String
-    let hasCheckmark: Bool
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            ZStack(alignment: .topTrailing) {
-                ZStack(alignment: .bottomLeading) {
-                    Image(image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 220, height: 274)
-                        .clipped()
-                        .cornerRadius(13)
-                    
-                    // Text overlay at bottom
-                    VStack(alignment: .leading, spacing: 4) {
-                        Spacer()
-                        Text(title)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.white)
-                            .shadow(radius: 10)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .background {
-                                Color.black.opacity(0.3).blur(radius: 5)
-                            }
-                        
-                        Text(dates)
-                            .font(.system(size: 12))
-                            .foregroundColor(.white)
-                            .shadow(radius: 10)
-                            .background {
-                                Color.black.opacity(0.3).blur(radius: 5)
-                                    .frame(maxWidth: .infinity)
-                            }
-                    }
-                    .padding()
-                }
-                
-                // Checkmark overlay
-                if hasCheckmark {
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 24, height: 24)
-                        .overlay(
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.white)
-                        )
-                        .padding(8)
-                }
-            }
-        }
-        .background(Color.white)
-        .cornerRadius(10)
-        .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
-    }
-}
+// CampCard is defined in UnifiedTrainingView.swift
 
 // MARK: - Starter Package Component
 struct StarterPackageView: View {

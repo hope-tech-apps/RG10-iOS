@@ -16,6 +16,8 @@ class MerchandiseDetailViewModel: ObservableObject {
     @Published var quantity = 1
     @Published var isLoadingSizes = true // Start as true
     @Published var errorMessage: String?
+    @Published var showingWebView = false
+    @Published var webViewConfig: MerchandiseWebViewConfig?
     
     private let service = MerchandiseService.shared
     
@@ -79,6 +81,24 @@ class MerchandiseDetailViewModel: ObservableObject {
             return
         }
         
-        UIApplication.shared.open(url)
+        // Create webview config for merchandise checkout
+        webViewConfig = MerchandiseWebViewConfig(
+            url: paymentLink,
+            productName: product.name,
+            selectedSize: selectedSize?.displayName ?? "Standard",
+            quantity: quantity
+        )
+        showingWebView = true
+    }
+    
+    func dismissWebView() {
+        showingWebView = false
+        webViewConfig = nil
+    }
+    
+    func handleCheckoutSuccess() {
+        // Handle successful checkout
+        print("✅ Merchandise checkout completed successfully!")
+        dismissWebView()
     }
 }

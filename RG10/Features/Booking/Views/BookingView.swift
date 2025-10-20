@@ -243,7 +243,7 @@ struct BookingCard: View {
                     VStack(alignment: .trailing, spacing: 4) {
                         StatusBadge(status: booking.status)
                         
-                        if !canModify && booking.isUpcoming {
+                        if !canModify && booking.isUpcoming == true {
                             Text("24hr lock")
                                 .font(.system(size: 10))
                                 .foregroundColor(.orange)
@@ -255,7 +255,7 @@ struct BookingCard: View {
                     }
                 }
                 
-                if let location = booking.location {
+                if let location = booking.location, !location.isEmpty {
                     HStack {
                         Image(systemName: "location.fill")
                             .font(.system(size: 12))
@@ -281,7 +281,7 @@ struct StatusBadge: View {
     
     var statusColor: Color {
         switch status {
-        case .confirmed, .upcoming:
+        case .confirmed, .upcoming, .accepted:
             return .green
         case .cancelled:
             return .red
@@ -291,6 +291,10 @@ struct StatusBadge: View {
             return .orange
         case .rejected:
             return .red
+        case .current:
+            return .purple
+        case .unconfirmed:
+            return .yellow
         }
     }
     

@@ -103,7 +103,7 @@ class BookingService: ObservableObject {
     
     // MARK: - Cancel Booking (Using POST via functions.invoke)
     
-    func cancelBooking(bookingUid: String, reason: String? = nil) async throws {
+    func cancelBooking(bookingUid: String, reason: String) async throws {
         await MainActor.run {
             self.isLoading = true
             self.errorMessage = nil
@@ -117,7 +117,7 @@ class BookingService: ObservableObject {
             
             let payload = CancelBookingPayload(
                 bookingUid: bookingUid,
-                cancellationReason: reason ?? "Cancelled by user"
+                cancellationReason: reason
             )
             let encodedBody = try JSONEncoder().encode(payload)
             
@@ -206,12 +206,12 @@ class BookingService: ObservableObject {
     }
     
     func upcomingBookings() -> [Booking] {
-        return bookings.filter { $0.isUpcoming }
+        return bookings.filter { $0.isUpcoming == true }
             .sorted { $0.start < $1.start }
     }
     
     func pastBookings() -> [Booking] {
-        return bookings.filter { $0.isPast }
+        return bookings.filter { $0.isPast == true }
             .sorted { $0.start > $1.start }
     }
     
@@ -222,6 +222,30 @@ class BookingService: ObservableObject {
     
     func refreshBookings(email: String? = nil) async throws {
         try await fetchBookings(email: email)
+    }
+    
+    // MARK: - Payment Integration
+    
+    /// Creates a payment intent for a booking
+    func createBookingPaymentIntent(bookingUid: String) async throws -> BookingIntentResponse {
+        guard let userId = AuthManager.shared.currentUser?.supabaseId else {
+            throw BookingError.invalidEmail
+        }
+        
+        return try await SupabasePaymentAPI.shared.createBookingIntent(
+            userId: userId,
+            bookingUid: bookingUid
+        )
+    }
+    
+    /// Handles successful payment completion
+    func handlePaymentSuccess(bookingUid: String) async {
+        // Refresh bookings to get updated status
+        do {
+            try await refreshBookings()
+        } catch {
+            print("Failed to refresh bookings after payment: \(error)")
+        }
     }
 }
 
@@ -239,6 +263,9 @@ enum BookingError: LocalizedError {
     case rescheduleFailed(String)
     case invalidEmail
     case noBookingFound
+    case invalidBookingUid
+    case missingPaymentIntent
+    case bookingIsFree
     
     var errorDescription: String? {
         switch self {
@@ -252,6 +279,12 @@ enum BookingError: LocalizedError {
             return "No user email found. Please sign in."
         case .noBookingFound:
             return "Booking not found"
+        case .invalidBookingUid:
+            return "Invalid booking UID"
+        case .missingPaymentIntent:
+            return "Payment intent not found"
+        case .bookingIsFree:
+            return "Booking is free for subscription users"
         }
     }
 }
