@@ -21,7 +21,7 @@ struct PaymentConfiguration {
     /// Stripe secret key (for server-side operations only)
     /// This should NEVER be included in your iOS app
     /// Keep this on your server/backend only
-    static let stripeSecretKey = "sk_test_51S4YTJ2MsIjS8n0FajUpl14Yl8XNaaFYXiZCnBLXMzT5A3aebHoJXeC5Zix20wRyd7Q2NITrCxdFRiUcQAfOE10A00Xp7z5qI6"
+    // static let stripeSecretKey = "REMOVED_FOR_SECURITY"
     
     // MARK: - Supabase Configuration
     
