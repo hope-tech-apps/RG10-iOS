@@ -14,6 +14,13 @@ struct RG10App: App {
     @State private var showLoading = true
     @State private var showWelcome = false
     
+    init() {
+        // Debug configuration for Xcode Cloud troubleshooting
+        #if DEBUG
+        DebugConfiguration.printConfigurationDebugInfo()
+        #endif
+    }
+    
     var body: some Scene {
         WindowGroup {
             ZStack {

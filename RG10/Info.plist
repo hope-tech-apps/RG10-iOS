@@ -16,5 +16,52 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
+	
+	<!-- Privacy Usage Descriptions -->
+	<!-- Required by Apple even if not directly used by the app -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app does not directly use the camera, but some third-party SDKs may reference camera APIs for future functionality.</string>
+	
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app does not directly access your photo library, but some third-party SDKs may reference photo library APIs for future functionality.</string>
+	
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app does not directly use the microphone, but some third-party SDKs may reference microphone APIs for future functionality.</string>
+	
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app does not directly access your location, but some third-party SDKs may reference location APIs for future functionality.</string>
+	
+	<key>NSContactsUsageDescription</key>
+	<string>This app does not directly access your contacts, but some third-party SDKs may reference contacts APIs for future functionality.</string>
+	
+	<key>NSCalendarsUsageDescription</key>
+	<string>This app does not directly access your calendar, but some third-party SDKs may reference calendar APIs for future functionality.</string>
+	
+	<key>NSRemindersUsageDescription</key>
+	<string>This app does not directly access your reminders, but some third-party SDKs may reference reminders APIs for future functionality.</string>
+	
+	<key>NSMotionUsageDescription</key>
+	<string>This app does not directly access motion data, but some third-party SDKs may reference motion APIs for future functionality.</string>
+	
+	<key>NSHealthShareUsageDescription</key>
+	<string>This app does not directly access health data, but some third-party SDKs may reference health APIs for future functionality.</string>
+	
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>This app does not directly update health data, but some third-party SDKs may reference health APIs for future functionality.</string>
+	
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app does not directly use Bluetooth, but some third-party SDKs may reference Bluetooth APIs for future functionality.</string>
+	
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app does not directly use Bluetooth, but some third-party SDKs may reference Bluetooth APIs for future functionality.</string>
+	
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app does not directly use speech recognition, but some third-party SDKs may reference speech recognition APIs for future functionality.</string>
+	
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app does not directly use Face ID, but some third-party SDKs may reference Face ID APIs for future functionality.</string>
+	
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This app does not track users across other apps, but some third-party SDKs may reference tracking APIs for future functionality.</string>
 </dict>
 </plist>
