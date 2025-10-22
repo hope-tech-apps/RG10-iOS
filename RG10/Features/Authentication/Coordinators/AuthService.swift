@@ -225,7 +225,7 @@ class MockAuthService: AuthServiceProtocol {
 }
 
 // MARK: - Profile Data Model (for Supabase profiles table)
-nonisolated(unsafe) struct ProfileData: Codable, Sendable {
+struct ProfileData: Codable {
     let id: String
     let username: String?
     let email: String?

@@ -192,21 +192,10 @@ final class PaymentSheetService: ObservableObject {
 }
 
 // MARK: - PaymentSheet Result Extension
+// Note: Removed Equatable conformance to avoid warning about extending imported types
+// If you need equality comparison, implement it in your own wrapper type
 
-extension PaymentSheetResult: Equatable {
-    public static func == (lhs: PaymentSheetResult, rhs: PaymentSheetResult) -> Bool {
-        switch (lhs, rhs) {
-        case (.completed, .completed):
-            return true
-        case (.canceled, .canceled):
-            return true
-        case (.failed(let lhsError), .failed(let rhsError)):
-            return lhsError.localizedDescription == rhsError.localizedDescription
-        default:
-            return false
-        }
-    }
-    
+extension PaymentSheetResult {
     var isSuccess: Bool {
         if case .completed = self {
             return true

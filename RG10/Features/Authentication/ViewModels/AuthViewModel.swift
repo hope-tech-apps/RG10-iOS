@@ -39,7 +39,7 @@ class AuthViewModel: AuthViewModelProtocol {
     let registrationURL = "https://www.rg10football.com/wp-login.php?action=lostpassword"
     
     init(authService: AuthServiceProtocol = AuthService(),
-         authManager: AuthManager = .shared) {
+         authManager: AuthManager = AuthManager.shared) {
         self.authService = authService
         self.authManager = authManager
     }
