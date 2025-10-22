@@ -11,12 +11,13 @@ import Foundation
 
 struct PaymentConfiguration {
     
-    // MARK: - Stripe Keys
+    // MARK: - Configuration Properties (Now using EnvironmentConfiguration)
     
     /// Stripe publishable key for your app
-    /// TODO: Replace with your actual Stripe publishable key
-    /// Get this from your Stripe Dashboard: https://dashboard.stripe.com/apikeys
-    static let stripePublishableKey = "pk_test_51S4YTJ2MsIjS8n0Frb5RizsyuEFmk2fq9zoo9qRdSxlEuaf0aQYsxY2Ge3JVKX7DND2mv4di6ZOAnqF7yvlA4rr100tYxyjIkS" // Test key for development
+    /// Now sourced from environment variables for better security
+    static var stripePublishableKey: String {
+        return EnvironmentConfiguration.stripePublishableKey
+    }
     
     /// Stripe secret key (for server-side operations only)
     /// This should NEVER be included in your iOS app
@@ -26,50 +27,37 @@ struct PaymentConfiguration {
     // MARK: - Supabase Configuration
     
     /// Supabase URL for your project
-    static let supabaseURL = "https://uwssjvqlsekveqvdkdnj.supabase.co"
+    static var supabaseURL: String {
+        return EnvironmentConfiguration.supabaseURL
+    }
     
     /// Supabase anon key
-    static let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3c3NqdnFsc2VrdmVxdmRrZG5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyMTU5OTksImV4cCI6MjA3Mjc5MTk5OX0.HG6t79U5z8w_f0Qfwgclkxs4aZOfgALbMEwXN9ZTA00"
+    static var supabaseAnonKey: String {
+        return EnvironmentConfiguration.supabaseAnonKey
+    }
     
     // MARK: - App Configuration
     
     /// Merchant display name for Stripe
-    static let merchantDisplayName = "RG10 Football"
+    static var merchantDisplayName: String {
+        return EnvironmentConfiguration.merchantDisplayName
+    }
     
     /// App scheme for deep linking
-    static let appScheme = "rg10"
+    static var appScheme: String {
+        return EnvironmentConfiguration.appScheme
+    }
     
     // MARK: - Validation
     
     /// Validates that all required configuration is present
     static var isValid: Bool {
-        return !stripePublishableKey.isEmpty &&
-               !supabaseURL.isEmpty &&
-               !supabaseAnonKey.isEmpty &&
-               !merchantDisplayName.isEmpty
+        return EnvironmentConfiguration.isValid
     }
     
     /// Returns validation errors if any
     static var validationErrors: [String] {
-        var errors: [String] = []
-        
-        if stripePublishableKey.isEmpty || stripePublishableKey.contains("your_publishable_key_here") {
-            errors.append("Stripe publishable key is not configured")
-        }
-        
-        if supabaseURL.isEmpty {
-            errors.append("Supabase URL is not configured")
-        }
-        
-        if supabaseAnonKey.isEmpty {
-            errors.append("Supabase anon key is not configured")
-        }
-        
-        if merchantDisplayName.isEmpty {
-            errors.append("Merchant display name is not configured")
-        }
-        
-        return errors
+        return EnvironmentConfiguration.validationErrors
     }
 }
 
@@ -93,50 +81,45 @@ extension PaymentConfiguration {
     
     /// Gets the appropriate Stripe key based on environment
     static var currentStripeKey: String {
-        if isDevelopment {
-            return stripePublishableKey
-        } else {
-            // In production, you might want to use a different key
-            return stripePublishableKey
-        }
+        return stripePublishableKey
     }
 }
 
 // MARK: - Setup Instructions
 
 /*
- SETUP INSTRUCTIONS:
+ SECURITY ENHANCED SETUP INSTRUCTIONS:
  
- 1. Stripe Configuration:
-    - Go to https://dashboard.stripe.com/apikeys
-    - Copy your publishable key (starts with pk_test_ or pk_live_)
-    - Replace the stripePublishableKey value above
-    - NEVER put your secret key (sk_test_ or sk_live_) in your iOS app
+ 1. Environment Configuration:
+    - Use EnvironmentConfiguration.swift for all API keys
+    - Keys are now sourced from environment variables or Bundle info
+    - See Config.xcconfig.example for local development setup
  
- 2. Supabase Configuration:
-    - Your Supabase URL and anon key are already configured
-    - Make sure your Supabase project has the required edge functions:
-      - payments-create-booking-intent
-      - billing-create-subscription-session
-      - cancel-subscription
-      - cancel-booking
-      - abort-subscription-intent
-      - get-bookings
+ 2. Xcode Cloud CI/CD Setup:
+    - Add environment variables in Xcode Cloud project settings:
+      * STRIPE_PUBLISHABLE_KEY
+      * SUPABASE_URL  
+      * SUPABASE_ANON_KEY
+      * YOUTUBE_API_KEY
+    - Never commit actual keys to version control
  
- 3. Edge Functions Setup:
-    - Each edge function should handle the appropriate payment logic
-    - Functions should return the expected response models
-    - Make sure to handle errors gracefully
+ 3. Local Development:
+    - Copy Config.xcconfig.example to Config.xcconfig
+    - Add your actual keys to Config.xcconfig
+    - Add Config.xcconfig to .gitignore
+    - Use different keys for different environments
  
- 4. Testing:
-    - Use Stripe test mode for development
-    - Test with Stripe test card numbers
-    - Switch to live mode only for production
- 
- 5. Security:
-    - Never commit secret keys to version control
-    - Use environment variables or secure configuration for production
+ 4. Security Best Practices:
+    - Rotate API keys regularly
+    - Monitor API usage and set up alerts
+    - Use API key restrictions where possible
     - Validate all payment responses on your server
+    - Never put secret keys in client applications
+ 
+ 5. Supabase Edge Functions:
+    - Make sure your Supabase project has the required edge functions
+    - Functions should handle all sensitive operations server-side
+    - Use proper error handling and validation
  */
 
 

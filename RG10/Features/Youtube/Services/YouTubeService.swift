@@ -12,13 +12,16 @@ import Combine
 final class YouTubeService: ObservableObject {
     static let shared = YouTubeService()
     
-    // IMPORTANT: You need to get an API key from Google Cloud Console
+    // IMPORTANT: API key is now sourced from environment configuration
+    // See EnvironmentConfiguration.swift for setup instructions
     // 1. Go to https://console.cloud.google.com/
     // 2. Create a new project or select existing
     // 3. Enable YouTube Data API v3
     // 4. Create credentials (API Key)
     // 5. Restrict the key to your app's bundle ID
-    private let API_KEY = "AIzaSyC9PEMSZulrgO3hnMYqUbAKtfsM7jWAuYM"
+    private var API_KEY: String {
+        return EnvironmentConfiguration.youtubeAPIKey
+    }
     private let baseURL = "https://www.googleapis.com/youtube/v3"
     
     @Published var playlistVideos: [YouTubeVideo] = []

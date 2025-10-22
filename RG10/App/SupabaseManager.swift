@@ -17,8 +17,8 @@ class SupabaseClientManager {
     
     private init() {
         self.client = SupabaseClient(
-            supabaseURL: URL(string: "https://uwssjvqlsekveqvdkdnj.supabase.co")!,
-            supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3c3NqdnFsc2VrdmVxdmRrZG5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyMTU5OTksImV4cCI6MjA3Mjc5MTk5OX0.HG6t79U5z8w_f0Qfwgclkxs4aZOfgALbMEwXN9ZTA00",
+            supabaseURL: URL(string: EnvironmentConfiguration.supabaseURL)!,
+            supabaseKey: EnvironmentConfiguration.supabaseAnonKey,
             options: SupabaseClientOptions(db: .init(schema: "rg10"))
         )
     }

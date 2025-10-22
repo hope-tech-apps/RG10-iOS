@@ -270,7 +270,6 @@ class BookingFlowCoordinator: ObservableObject {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(PaymentConfiguration.stripeSecretKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         
         // Convert request body to form data
