@@ -21,84 +21,57 @@ class AuthService: AuthServiceProtocol {
     
     func login(username: String, password: String) async throws -> AuthResponse {
         do {
-            let session: Session
-            let actualEmail: String
-            let actualUsername: String
-            let displayName: String
-            
-            // Check if username is an email or actual username
-            if username.contains("@") {
-                // Direct email login
-                session = try await client.auth.signIn(
-                    email: username,
-                    password: password
-                )
-                
-                // Get the current user details
-                guard let user = client.auth.currentUser else {
-                    throw AuthError.userNotFound
-                }
-                
-                actualEmail = user.email ?? username
-
-                // Extract username and display name from user metadata (Supabase stores `[String: AnyJSON]`)
-                let metadata = user.userMetadata
-
-                func anyJSONToString(_ value: AnyJSON?) -> String? {
-                    guard let value else { return nil }
-                    switch value {
-                    case .string(let s):
-                        return s
-                    case .bool(let b):
-                        return String(b)
-                    case .null:
-                        return nil
-                    case .array, .object:
-                        return nil
-                    @unknown default:
-                        // Fallback: stringify any other representable values
-                        return String(describing: value)
-                    }
-                }
-
-                if let uname = anyJSONToString(metadata["username"]) {
-                    actualUsername = uname
-                } else {
-                    actualUsername = actualEmail.components(separatedBy: "@").first ?? "User"
-                }
-
-                if let dname = anyJSONToString(metadata["display_name"]) {
-                    displayName = dname
-                } else {
-                    displayName = actualUsername
-                }
-            } else {
-                // Username-based login - need to find email first
-                // Decode manually after async boundary to avoid actor-isolation issues
-                let response = try await client
-                    .from("profiles")
-                    .select()
-                    .eq("username", value: username)
-                    .execute()
-                
-                let profiles = try JSONDecoder().decode([ProfileData].self, from: response.data)
-                
-                guard let profile = profiles.first,
-                      let email = profile.email else {
-                    throw AuthError.userNotFound
-                }
-                
-                // Sign in with the found email
-                session = try await client.auth.signIn(
-                    email: email,
-                    password: password
-                )
-                
-                actualEmail = email
-                actualUsername = profile.username ?? username
-                displayName = profile.displayName ?? username
+            // Email is the only supported sign-in identifier; username is display-only metadata
+            guard username.contains("@") else {
+                throw AuthError.emailSignInRequired
             }
-            
+
+            let session = try await client.auth.signIn(
+                email: username,
+                password: password
+            )
+
+            // Get the current user details
+            guard let user = client.auth.currentUser else {
+                throw AuthError.userNotFound
+            }
+
+            let actualEmail = user.email ?? username
+
+            // Extract username and display name from user metadata (Supabase stores `[String: AnyJSON]`)
+            let metadata = user.userMetadata
+
+            func anyJSONToString(_ value: AnyJSON?) -> String? {
+                guard let value else { return nil }
+                switch value {
+                case .string(let s):
+                    return s
+                case .bool(let b):
+                    return String(b)
+                case .null:
+                    return nil
+                case .array, .object:
+                    return nil
+                @unknown default:
+                    // Fallback: stringify any other representable values
+                    return String(describing: value)
+                }
+            }
+
+            let actualUsername: String
+            if let uname = anyJSONToString(metadata["username"]) {
+                actualUsername = uname
+            } else {
+                actualUsername = actualEmail.components(separatedBy: "@").first ?? "User"
+            }
+
+            let displayName: String
+            if let dname = anyJSONToString(metadata["display_name"]) {
+                displayName = dname
+            } else {
+                displayName = actualUsername
+            }
+
             return AuthResponse(
                 token: session.accessToken,
                 userEmail: actualEmail,
@@ -129,31 +102,7 @@ class AuthService: AuthServiceProtocol {
             )
             
             let requiresConfirmation = response.user.confirmedAt == nil
-            
-            // Create profile entry in profiles table
-            // This will be handled automatically by the trigger we created
-            // but we can also do it manually if needed
-            if let userId = Optional(response.user.id) {
-                // The trigger should handle this, but we can try to insert manually as backup
-                do {
-                    // Encode manually to avoid actor-isolation issues with Sendable
-                    let profileData: [String: String?] = [
-                        "id": userId.uuidString,
-                        "username": username,
-                        "email": email,
-                        "display_name": username
-                    ]
-                    
-                    try await client
-                        .from("profiles")
-                        .insert(profileData)
-                        .execute()
-                } catch {
-                    // Profile might already exist from trigger, that's okay
-                    print("Profile creation handled by trigger or already exists")
-                }
-            }
-            
+
             let message = requiresConfirmation
                 ? "Registration successful! Please check your email to confirm your account."
                 : "Registration successful!"
@@ -224,30 +173,6 @@ class MockAuthService: AuthServiceProtocol {
         if !shouldSucceed {
             throw AuthError.networkError
         }
-    }
-}
-
-// MARK: - Profile Data Model (for Supabase profiles table)
-/// A thread-safe model for Supabase profiles table data.
-/// Uses auto-synthesized Codable to avoid actor-isolation issues with Sendable.
-struct ProfileData: Codable, Sendable {
-    let id: String
-    let username: String?
-    let email: String?
-    let displayName: String?
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case username
-        case email
-        case displayName = "display_name"
-    }
-
-    init(id: String, username: String?, email: String?, displayName: String?) {
-        self.id = id
-        self.username = username
-        self.email = email
-        self.displayName = displayName
     }
 }
 

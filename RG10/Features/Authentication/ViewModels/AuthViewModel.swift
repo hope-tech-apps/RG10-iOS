@@ -83,7 +83,7 @@ class AuthViewModel: AuthViewModelProtocol {
     
     func login() async {
         guard isLoginValid else {
-            showError("Please enter username/email and password")
+            showError("Please enter your email and password")
             return
         }
         
@@ -95,21 +95,13 @@ class AuthViewModel: AuthViewModelProtocol {
         errorMessage = nil
         
         do {
-            // If username contains @, treat it as email, otherwise try username-based login
-            let loginIdentifier = username.contains("@") ? username : username
-            
-            // Use the auth service for compatibility with existing code
-            let response = try await authService.login(username: loginIdentifier, password: password)
-            
+            // Email-only sign-in; AuthService rejects non-email identifiers
+            let response = try await authService.login(username: username, password: password)
+
             // The AuthManager will be updated automatically through auth state listener
             // But we can also manually trigger if needed
-            if !username.contains("@") {
-                // If logging in with username, we might need to sign in again with the actual email
-                try await authManager.signIn(email: response.userEmail, password: password)
-            } else {
-                try await authManager.signIn(email: username, password: password)
-            }
-            
+            try await authManager.signIn(email: response.userEmail, password: password)
+
             clearFields()
         } catch {
             showError(error.localizedDescription)

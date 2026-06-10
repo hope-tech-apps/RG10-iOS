@@ -10,6 +10,7 @@ import Foundation
 // MARK: - Auth Error
 enum AuthError: LocalizedError {
     case invalidCredentials
+    case emailSignInRequired
     case networkError
     case invalidResponse
     case registrationFailed(String)
@@ -20,7 +21,9 @@ enum AuthError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidCredentials:
-            return "Invalid username/email or password"
+            return "Invalid email or password"
+        case .emailSignInRequired:
+            return "Please sign in with your email address."
         case .networkError:
             return "Network error. Please check your connection"
         case .invalidResponse:

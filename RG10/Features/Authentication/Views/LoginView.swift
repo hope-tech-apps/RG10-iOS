@@ -35,7 +35,7 @@ struct LoginView<ViewModel: AuthViewModelProtocol>: View {
                         
                         // Form Fields
                         VStack(spacing: 16) {
-                            // Email/Username Field
+                            // Email Field
                             HStack {
                                 IconView(iconName: Icons.mail, size: 20, color: .gray)
                                 TextField("Email", text: $viewModel.username)
