@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CombinedBookingView: View {
-    @StateObject private var bookingService = EnhancedBookingService.shared
+    @ObservedObject private var bookingService = EnhancedBookingService.shared
     
     @State private var selectedTab = 0
     @State private var showingCancelAlert = false
@@ -32,6 +32,12 @@ struct CombinedBookingView: View {
                 contentView
             }
             .navigationBarHidden(true)
+            .onAppear {
+                MemoryMonitor.shared.viewAppeared("CombinedBookingView")
+            }
+            .onDisappear {
+                MemoryMonitor.shared.viewDisappeared("CombinedBookingView")
+            }
             .task {
                 await loadInitialData()
             }

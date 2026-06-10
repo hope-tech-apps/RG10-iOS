@@ -14,6 +14,7 @@ enum NavigationDestination: Hashable {
     case login
     case signUp
     case forgotPassword
+    case resetPassword(code: String) // Deep link password reset with recovery code
     
     // Main Content
     case about
@@ -25,6 +26,7 @@ enum NavigationDestination: Hashable {
     case videoLibrary
     case playerSpotlights
     case myPlans
+    case photoGallery
 
     // Training
     case trainingPackages

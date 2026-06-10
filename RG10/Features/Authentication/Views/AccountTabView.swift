@@ -9,7 +9,6 @@ import SwiftUI
 
 struct AccountTabView: View {
     @StateObject private var authViewModel = AuthViewModel()
-    @ObservedObject var authManager = AuthManager.shared
     @State private var showSignUp = false
     
     var body: some View {

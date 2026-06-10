@@ -11,7 +11,7 @@ import StripePaymentSheet
 // MARK: - Enhanced Booking View
 
 struct EnhancedBookingView: View {
-    @StateObject private var bookingService = EnhancedBookingService.shared
+    @ObservedObject private var bookingService = EnhancedBookingService.shared
     @StateObject private var paymentFlowVM = BookingFlowViewModel()
     
     @State private var selectedTab = 0
@@ -334,7 +334,7 @@ struct EnhancedBookingCard: View {
     let onCancel: () -> Void
     let onReschedule: () -> Void
     
-    @StateObject private var bookingService = EnhancedBookingService.shared
+    @ObservedObject private var bookingService = EnhancedBookingService.shared
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct MerchandiseView: View {
     @StateObject private var viewModel = MerchandiseViewModel()

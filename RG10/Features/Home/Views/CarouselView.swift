@@ -10,7 +10,7 @@ import SwiftUI
 struct CarouselView<ViewModel: HomeViewModelProtocol>: View {
     @ObservedObject var viewModel: ViewModel
     @EnvironmentObject var navigationManager: NavigationManager
-    @ObservedObject var authManager = AuthManager.shared
+    @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
         ZStack {

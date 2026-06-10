@@ -35,6 +35,7 @@ final class SubscriptionService: ObservableObject {
     private var cachedUserSubscription: DBUserSubscription?
     
     private init() {
+        MemoryMonitor.shared.objectInitialized("SubscriptionService")
         // Initialize with cached data if available
         Task {
             await loadCachedData()

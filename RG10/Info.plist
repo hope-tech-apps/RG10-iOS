@@ -6,7 +6,11 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string></string>
+			<string>com.rg10football.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rg10</string>
+			</array>
 		</dict>
 	</array>
 	<key>NSAppTransportSecurity</key>

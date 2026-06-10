@@ -43,6 +43,7 @@ final class EnhancedBookingService: ObservableObject {
     }
     
     private init() {
+        MemoryMonitor.shared.objectInitialized("EnhancedBookingService")
         // Initialize with cached data if available
         Task {
             await loadCachedBookingTypes()
@@ -122,15 +123,19 @@ final class EnhancedBookingService: ObservableObject {
                 fallbackMessage: "Unable to fetch bookings. Please try again.",
                 parameters: [("email", validEmail)]
             ) { text in
-                print("🔍 Raw get-bookings response: \(text)")
-                print("🔍 Response length: \(text.count) characters")
+                #if DEBUG
+                // Only log summary, not full response (saves memory)
+                print("🔍 Get-bookings response length: \(text.count) characters")
+                #endif
                 
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .iso8601
                 let decodedResponse = try decoder.decode(GetBookingsResponse.self, from: text.data(using: .utf8)!)
                 
+                #if DEBUG
                 print("🔍 Decoded response status: \(decodedResponse.status)")
-                print("🔍 Decoded response data: \(decodedResponse.data)")
+                print("🔍 Booking counts - past: \(decodedResponse.data.past.count), cancelled: \(decodedResponse.data.cancelled.count)")
+                #endif
                 
                 return decodedResponse
             }

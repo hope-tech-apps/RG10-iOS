@@ -37,6 +37,7 @@ struct UnifiedTrainingView: View {
             }
             .background(Color(UIColor.systemGray6))
         }
+        .trackMemory("UnifiedTrainingView")
         .task {
             await viewModel.loadInitialData()
         }

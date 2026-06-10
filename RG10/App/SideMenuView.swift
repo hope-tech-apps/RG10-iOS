@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SideMenuView: View {
     @Binding var isShowing: Bool
-    @ObservedObject var authManager = AuthManager.shared
+    @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var navigationManager: NavigationManager
     @State private var showingBookingWebView = false
 
@@ -107,6 +107,15 @@ struct SideMenuView: View {
                             action: {
                                 isShowing = false
                                 navigationManager.navigate(to: .merchandise, in: .home)
+                            }
+                        )
+                        
+                        MenuRowView(
+                            title: "Photo Gallery",
+                            icon: Icons.photoGallery,
+                            action: {
+                                isShowing = false
+                                navigationManager.navigate(to: .photoGallery, in: .home)
                             }
                         )
                     }

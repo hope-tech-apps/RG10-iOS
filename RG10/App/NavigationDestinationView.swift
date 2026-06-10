@@ -21,6 +21,8 @@ struct NavigationDestinationView: View {
                 SignUpView(viewModel: AuthViewModel())
             case .forgotPassword:
                 ForgotPasswordView()
+            case .resetPassword(let code):
+                ResetPasswordView(recoveryCode: code)
             case .about:
                 AboutView()
             case .staff(let selectedIndex):
@@ -71,6 +73,8 @@ struct NavigationDestinationView: View {
                 EmptyView()
             case .myPlans:
                 MyPlansView()
+            case .photoGallery:
+                PhotoGalleryView()
             }
         }
         .toolbar(.hidden, for: .tabBar) // Add this line to hide tab bar

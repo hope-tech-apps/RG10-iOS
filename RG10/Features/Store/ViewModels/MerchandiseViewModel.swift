@@ -20,10 +20,15 @@ class MerchandiseViewModel: ObservableObject {
     private let service = MerchandiseService.shared
     
     init() {
+        MemoryMonitor.shared.objectInitialized("MerchandiseViewModel")
         Task {
             await loadProducts()
             await loadCategories()
         }
+    }
+    
+    deinit {
+        MemoryMonitor.shared.objectDeinitialized("MerchandiseViewModel")
     }
     
     func loadProducts() async {

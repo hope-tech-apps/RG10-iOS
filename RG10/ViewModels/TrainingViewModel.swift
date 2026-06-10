@@ -26,12 +26,17 @@ class TrainingViewModel: ObservableObject {
 
     // MARK: - Initialization
     init() {
+        MemoryMonitor.shared.objectInitialized("TrainingViewModel")
         self.isPremium = userDefaults.bool(forKey: "isPremium")
         loadCamps()
         setupBindings()
         Task {
             await checkSubscriptionStatus()
         }
+    }
+    
+    deinit {
+        MemoryMonitor.shared.objectDeinitialized("TrainingViewModel")
     }
     
     // MARK: - Private Methods
@@ -127,7 +132,12 @@ class TrainingPackagesViewModel: ObservableObject {
     private let registrationURL = "https://www.oasyssports.com/RG10Football/global-login.cfm"
     
     init() {
+        MemoryMonitor.shared.objectInitialized("TrainingPackagesViewModel")
         loadPackages()
+    }
+    
+    deinit {
+        MemoryMonitor.shared.objectDeinitialized("TrainingPackagesViewModel")
     }
     
     private func loadPackages() {

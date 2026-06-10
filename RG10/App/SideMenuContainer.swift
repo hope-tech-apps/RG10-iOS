@@ -10,6 +10,7 @@ import SwiftUI
 struct SideMenuContainer: View {
     @Binding var isShowing: Bool
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var authManager: AuthManager
     
     private let menuWidth = UIScreen.main.bounds.width * 0.8
     @State private var dragOffset: CGFloat = 0
@@ -31,6 +32,7 @@ struct SideMenuContainer: View {
                 HStack {
                     SideMenuView(isShowing: $isShowing)
                         .environmentObject(navigationManager)
+                        .environmentObject(authManager)
                         .frame(width: menuWidth)
                         .offset(x: dragOffset)
                         .transition(.move(edge: .leading))

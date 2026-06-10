@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import Combine
 
 // MARK: - Subscription Management View
 
 struct SubscriptionManagementView: View {
-    @StateObject private var subscriptionService = SubscriptionService.shared
+    @ObservedObject private var subscriptionService = SubscriptionService.shared
     @State private var showingCancelAlert = false
     @State private var isCancelling = false
     

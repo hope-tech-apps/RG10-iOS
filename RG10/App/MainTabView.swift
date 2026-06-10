@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @StateObject private var navigationManager = NavigationManager.shared
-    @StateObject private var authManager = AuthManager.shared
+    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var authManager: AuthManager
     @StateObject private var coordinator = AppCoordinator()
     @State private var showingSideMenu = false
     @State private var sideMenuOffset: CGFloat = 0
@@ -126,13 +126,17 @@ struct MainTabView: View {
             }
             .environmentObject(navigationManager)
             
-            // Side Menu Overlay
-            if showingSideMenu {
-                SideMenuContainer(isShowing: $showingSideMenu)
-                    .environmentObject(navigationManager)
+                // Side Menu Overlay
+                if showingSideMenu {
+                    SideMenuContainer(isShowing: $showingSideMenu)
+                        .environmentObject(navigationManager)
+                        .environmentObject(authManager)
+                }
+            }
+            .onAppear {
+                MemoryMonitor.shared.logMemory("MainTabView appeared")
             }
         }
-    }
     
     private var availableTabs: [TabItem] {
         TabItem.availableTabs(isAuthenticated: authManager.isAuthenticated)
@@ -142,13 +146,15 @@ struct MainTabView: View {
 // HomeContentView
 struct HomeContentView: View {
     @StateObject private var viewModel = HomeViewModel()
-    @EnvironmentObject var navigationManager: NavigationManager  // Add this
+    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
                 CarouselView(viewModel: viewModel)
-                    .environmentObject(navigationManager)  // Pass it down
+                    .environmentObject(navigationManager)
+                    .environmentObject(authManager)
                     .frame(height: 400)
                 
                 OurStorySection(videos: viewModel.videos)

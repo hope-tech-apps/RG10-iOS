@@ -40,8 +40,13 @@ class AuthViewModel: AuthViewModelProtocol {
     
     init(authService: AuthServiceProtocol = AuthService(),
          authManager: AuthManager = AuthManager.shared) {
+        MemoryMonitor.shared.objectInitialized("AuthViewModel")
         self.authService = authService
         self.authManager = authManager
+    }
+    
+    deinit {
+        MemoryMonitor.shared.objectDeinitialized("AuthViewModel")
     }
     
     // MARK: - Validation

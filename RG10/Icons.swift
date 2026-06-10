@@ -59,6 +59,9 @@ enum Icons {
     static let microphone = "Microphone"
     static let noSound = "No sound (microphone)"
     
+    // Gallery
+    static let photoGallery = "photo.on.rectangle.angled" // SF Symbol (no custom asset yet)
+    
     // Media & Entertainment
     static let camera = "Camera"
     static let gamepad = "Gamepad"

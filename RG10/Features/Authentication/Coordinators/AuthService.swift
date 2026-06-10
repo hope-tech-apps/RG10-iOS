@@ -74,12 +74,14 @@ class AuthService: AuthServiceProtocol {
                 }
             } else {
                 // Username-based login - need to find email first
-                let profiles: [ProfileData] = try await client
+                // Decode manually after async boundary to avoid actor-isolation issues
+                let response = try await client
                     .from("profiles")
                     .select()
                     .eq("username", value: username)
                     .execute()
-                    .value
+                
+                let profiles = try JSONDecoder().decode([ProfileData].self, from: response.data)
                 
                 guard let profile = profiles.first,
                       let email = profile.email else {
@@ -134,16 +136,17 @@ class AuthService: AuthServiceProtocol {
             if let userId = Optional(response.user.id) {
                 // The trigger should handle this, but we can try to insert manually as backup
                 do {
-                    let profile = ProfileData(
-                        id: userId.uuidString,
-                        username: username,
-                        email: email,
-                        displayName: username
-                    )
+                    // Encode manually to avoid actor-isolation issues with Sendable
+                    let profileData: [String: String?] = [
+                        "id": userId.uuidString,
+                        "username": username,
+                        "email": email,
+                        "display_name": username
+                    ]
                     
                     try await client
                         .from("profiles")
-                        .insert(profile)
+                        .insert(profileData)
                         .execute()
                 } catch {
                     // Profile might already exist from trigger, that's okay
@@ -225,7 +228,9 @@ class MockAuthService: AuthServiceProtocol {
 }
 
 // MARK: - Profile Data Model (for Supabase profiles table)
-struct ProfileData: Codable {
+/// A thread-safe model for Supabase profiles table data.
+/// Uses auto-synthesized Codable to avoid actor-isolation issues with Sendable.
+struct ProfileData: Codable, Sendable {
     let id: String
     let username: String?
     let email: String?
@@ -243,22 +248,6 @@ struct ProfileData: Codable {
         self.username = username
         self.email = email
         self.displayName = displayName
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try container.decode(String.self, forKey: .id)
-        self.username = try container.decodeIfPresent(String.self, forKey: .username)
-        self.email = try container.decodeIfPresent(String.self, forKey: .email)
-        self.displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
-        try container.encodeIfPresent(username, forKey: .username)
-        try container.encodeIfPresent(email, forKey: .email)
-        try container.encodeIfPresent(displayName, forKey: .displayName)
     }
 }
 

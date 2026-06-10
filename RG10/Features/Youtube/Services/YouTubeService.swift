@@ -35,6 +35,7 @@ final class YouTubeService: ObservableObject {
     private init() {
         // Configure decoder for better date handling
         decoder.dateDecodingStrategy = .iso8601
+        MemoryMonitor.shared.objectInitialized("YouTubeService")
     }
     
     // MARK: - Public Methods
@@ -197,8 +198,19 @@ final class YouTubeService: ObservableObject {
     
     private func logDebugInfo(_ message: String) async {
         let timestamp = DateFormatter.timeFormatter.string(from: Date())
-        debugInfo += "[\(timestamp)] \(message)\n"
+        let newLine = "[\(timestamp)] \(message)\n"
+        
+        // Limit debug info to prevent unbounded memory growth
+        // Keep only the last 50 lines
+        let lines = debugInfo.components(separatedBy: "\n")
+        if lines.count > 50 {
+            debugInfo = lines.suffix(50).joined(separator: "\n")
+        }
+        debugInfo += newLine
+        
+        #if DEBUG
         print("YouTubeService: \(message)")
+        #endif
     }
 }
 

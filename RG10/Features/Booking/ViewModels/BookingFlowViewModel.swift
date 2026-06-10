@@ -29,9 +29,14 @@ class BookingFlowViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     init() {
+        MemoryMonitor.shared.objectInitialized("BookingFlowViewModel")
         setupBindings()
         loadCoaches()
         loadBookingConfigs()
+    }
+    
+    deinit {
+        MemoryMonitor.shared.objectDeinitialized("BookingFlowViewModel")
     }
     
     // MARK: - Public Methods

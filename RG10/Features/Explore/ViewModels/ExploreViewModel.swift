@@ -49,8 +49,37 @@ class ExploreViewModel: ObservableObject {
         )
     ]
     
+    private var isSubscribed = false
+    
     init() {
+        MemoryMonitor.shared.objectInitialized("ExploreViewModel")
+        setupBindings()
         loadYouTubePlaylist()
+    }
+    
+    deinit {
+        MemoryMonitor.shared.objectDeinitialized("ExploreViewModel")
+    }
+    
+    private func setupBindings() {
+        // Only subscribe once to prevent multiple subscriptions
+        guard !isSubscribed else { return }
+        isSubscribed = true
+        
+        YouTubeService.shared.$playlistVideos
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] videos in
+                self?.recommendedVideos = videos.map { video in
+                    ExploreVideoItem(
+                        title: video.title,
+                        thumbnailURL: video.thumbnailURL,
+                        duration: video.duration,
+                        views: nil,
+                        videoID: video.videoID
+                    )
+                }
+            }
+            .store(in: &cancellables)
     }
     
     func loadYouTubePlaylist() {
@@ -59,20 +88,6 @@ class ExploreViewModel: ObservableObject {
                 .fetchPlaylistVideos(
                     playlistId: "PLPzb8bYVQEQEEH4q36QMcB5JzBRKBblVA"
                 )
-            
-            YouTubeService.shared.$playlistVideos
-                .sink { [weak self] videos in
-                    self?.recommendedVideos = videos.map { video in
-                        ExploreVideoItem(
-                            title: video.title,
-                            thumbnailURL: video.thumbnailURL,
-                            duration: video.duration,
-                            views: nil,
-                            videoID: video.videoID
-                        )
-                    }
-                }
-                .store(in: &cancellables)
         }
     }
 }

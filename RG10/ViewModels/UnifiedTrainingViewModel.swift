@@ -42,7 +42,12 @@ final class UnifiedTrainingViewModel: ObservableObject {
     // MARK: - Initialization
     
     init() {
+        MemoryMonitor.shared.objectInitialized("UnifiedTrainingViewModel")
         setupBindings()
+    }
+    
+    deinit {
+        MemoryMonitor.shared.objectDeinitialized("UnifiedTrainingViewModel")
     }
     
     // MARK: - Public Methods

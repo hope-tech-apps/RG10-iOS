@@ -159,23 +159,35 @@ class AuthManager: ObservableObject {
         try await client.auth.resetPasswordForEmail(email)
     }
     
-    func updatePassword(newPassword: String) async throws {
-        // The Supabase Swift SDK doesn't currently support direct password updates
-        // from an authenticated session. For password changes, users should:
-        // 1. Use the password reset flow (resetPasswordForEmail)
-        // 2. Or sign out and use "Forgot Password"
+    // MARK: - Password Reset Flow (Deep Link)
+    
+    /// Exchange the recovery code from deep link for a valid session
+    /// Call this after receiving `rg10://deep-link?code=<UUID>&type=recovery`
+    func exchangeCodeForSession(_ code: String) async throws {
+        let session = try await client.auth.exchangeCodeForSession(authCode: code)
         
-        // For security, most apps require the current password anyway
-        // So the recommended approach is to use the reset password flow
-        
-        // If you need this functionality, you can:
-        // Option 1: Trigger a password reset email
-        if let email = currentUser?.email {
-            try await resetPassword(email: email)
-            throw AuthError.registrationFailed("Password reset email sent. Please check your email to update your password.")
-        } else {
-            throw AuthError.registrationFailed("Unable to update password. Please sign out and use 'Forgot Password'.")
+        await MainActor.run {
+            self.session = session
+            self.isAuthenticated = true
+            self.loadUserProfile()
         }
+    }
+    
+    /// Update the user's password after validating session via recovery code
+    func updateUserPassword(newPassword: String) async throws {
+        try await client.auth.update(user: UserAttributes(password: newPassword))
+    }
+    
+    /// Complete password reset flow: exchange code and update password
+    func completePasswordReset(code: String, newPassword: String) async throws {
+        // Step 1: Exchange code for session
+        try await exchangeCodeForSession(code)
+        
+        // Step 2: Update password
+        try await updateUserPassword(newPassword: newPassword)
+        
+        // Step 3: Sign out so user can log in with new password
+        try await signOut()
     }
     
     // Alternative method if you want to remove password update functionality entirely:

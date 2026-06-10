@@ -57,7 +57,12 @@ class HomeViewModel: HomeViewModelProtocol {
     ]
     
     init() {
+        MemoryMonitor.shared.objectInitialized("HomeViewModel")
         filterCarouselItems(isAuthenticated: AuthManager.shared.isAuthenticated)
+    }
+    
+    deinit {
+        MemoryMonitor.shared.objectDeinitialized("HomeViewModel")
     }
     
     func filterCarouselItems(isAuthenticated: Bool) {

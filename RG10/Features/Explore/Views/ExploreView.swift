@@ -82,6 +82,7 @@ struct ExploreView: View {
             }
         }
         .background(Color.white)
+        .trackMemory("ExploreView")
     }
 }
 

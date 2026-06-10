@@ -11,7 +11,7 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     @ObservedObject var viewModel: ViewModel
     @State private var showMenu = false
     @EnvironmentObject var coordinator: AppCoordinator
-    @ObservedObject var authManager = AuthManager.shared
+    @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
         NavigationView {
