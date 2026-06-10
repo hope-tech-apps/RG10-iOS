@@ -10,13 +10,13 @@
       "layers" : [
         {
           "glass" : false,
-          "image-name" : "Vertical Lock-up-03 1.svg",
-          "name" : "Vertical Lock-up-03 1",
+          "image-name" : "rg10watermark.svg",
+          "name" : "rg10watermark",
           "position" : {
-            "scale" : 5,
+            "scale" : 6,
             "translation-in-points" : [
               0,
-              0
+              -20
             ]
           }
         }
