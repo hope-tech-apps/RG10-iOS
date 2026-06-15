@@ -156,7 +156,14 @@ struct HomeContentView: View {
                     .environmentObject(navigationManager)
                     .environmentObject(authManager)
                     .frame(height: 400)
-                
+
+                // TST 2026 spotlight
+                TSTSpotlightCard {
+                    navigationManager.navigate(to: .tstSpotlight, in: .home)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 24)
+
                 OurStorySection(videos: viewModel.videos)
                     .padding(.horizontal, 16)
                     .padding(.top, 24)

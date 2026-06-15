@@ -4,31 +4,42 @@
 //
 //  Created by Moneeb Sayed on 9/6/25.
 //
+//  Native grid of the live Flite Sports Shopify collection. Tapping a product,
+//  or the "Shop the full collection" header, opens an in-app browser for size
+//  selection, cart, and Shopify checkout.
+//
 
 import SwiftUI
 import Combine
 
+/// Wraps a URL so it can drive `sheet(item:)` for the in-app store browser.
+private struct StoreBrowserDestination: Identifiable {
+    let url: URL
+    var id: String { url.absoluteString }
+}
+
 struct MerchandiseView: View {
     @StateObject private var viewModel = MerchandiseViewModel()
-    
+    @State private var browserDestination: StoreBrowserDestination?
+
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Search Bar
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.gray)
-                
+
                 TextField("Search products...", text: $viewModel.searchText)
                     .textFieldStyle(PlainTextFieldStyle())
                     .onChange(of: viewModel.searchText) { _ in
                         viewModel.filterProducts()
                     }
-                
+
                 if !viewModel.searchText.isEmpty {
                     Button(action: {
                         viewModel.searchText = ""
@@ -44,7 +55,25 @@ struct MerchandiseView: View {
             .cornerRadius(10)
             .padding(.horizontal)
             .padding(.vertical, 8)
-            
+
+            // Shop the full collection
+            Button(action: { openCollection() }) {
+                HStack {
+                    Image(systemName: "bag.fill")
+                    Text("Shop the full collection")
+                        .font(.system(size: 16, weight: .semibold))
+                    Spacer()
+                    Image(systemName: "arrow.up.right")
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .background(AppConstants.Colors.primaryRed)
+                .cornerRadius(10)
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+
             // Products Grid
             if viewModel.isLoading {
                 Spacer()
@@ -72,6 +101,12 @@ struct MerchandiseView: View {
                     .padding(.vertical, 12)
                     .background(AppConstants.Colors.primaryRed)
                     .cornerRadius(8)
+
+                    Button("Open the store") {
+                        openCollection()
+                    }
+                    .foregroundColor(AppConstants.Colors.primaryRed)
+                    .font(.system(size: 15, weight: .medium))
                 }
                 Spacer()
             } else if viewModel.filteredProducts.isEmpty {
@@ -80,21 +115,23 @@ struct MerchandiseView: View {
                     Image(systemName: "bag.fill")
                         .font(.system(size: 60))
                         .foregroundColor(.gray.opacity(0.5))
-                    
+
                     Text("No products found")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.black)
-                    
-                    Text("Try adjusting your filters or search terms")
+
+                    Text("Try adjusting your search, or shop the full collection.")
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                 }
                 Spacer()
             } else {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(viewModel.filteredProducts, id: \.id) { product in
-                            NavigationLink(value: NavigationDestination.merchandiseDetail(product)) {
+                            Button(action: { openProduct(product) }) {
                                 MerchandiseCard(product: product)
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -105,14 +142,31 @@ struct MerchandiseView: View {
                 .background(Color(UIColor.systemGray6))
             }
         }
-        .navigationTitle("Merchandise")
+        .navigationTitle("Team Gear")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
+        .sheet(item: $browserDestination) { destination in
+            StoreWebView(
+                url: destination.url,
+                title: "Flite Sports",
+                onDismiss: { browserDestination = nil }
+            )
+        }
+    }
+
+    private func openCollection() {
+        guard let url = URL(string: StoreConstants.collectionURL) else { return }
+        browserDestination = StoreBrowserDestination(url: url)
+    }
+
+    private func openProduct(_ product: ShopifyProduct) {
+        guard let url = product.webURL else { return }
+        browserDestination = StoreBrowserDestination(url: url)
     }
 }
 
 // MARK: - Preview
-struct SupabaseMerchandiseView_Previews: PreviewProvider {
+struct MerchandiseView_Previews: PreviewProvider {
     static var previews: some View {
         MerchandiseView()
     }

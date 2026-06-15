@@ -4,94 +4,49 @@
 //
 //  Created by Moneeb Sayed on 9/10/25.
 //
+//  Fetches the live Flite Sports Shopify collection from its public
+//  products.json feed. No API key or account is required.
+//
 
 import Foundation
-import Supabase
-import SwiftUI
-import Combine
+
+enum MerchandiseServiceError: LocalizedError {
+    case invalidURL
+    case badResponse
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "The store address is invalid."
+        case .badResponse:
+            return "The store returned an unexpected response."
+        }
+    }
+}
 
 // MARK: - Merchandise Service
-class MerchandiseService: ObservableObject {
+final class MerchandiseService {
     static let shared = MerchandiseService()
-    
-    // Use the centralized client instead of creating a new one
-    private let client = SupabaseClientManager.shared.client
-    
+
     private init() {}
-    
-    // MARK: - Fetch All Products
-    func fetchProducts() async throws -> [Merchandise] {
-        let response = try await client
-            .from("products")
-            .select()
-            .execute()
-        
-        // Don't specify date decoding strategy - let it decode as strings
-        let decoder = JSONDecoder()
-        let products = try decoder.decode([Merchandise].self, from: response.data)
-        return products
-    }
-    
-    // MARK: - Fetch Product Sizes
-    func fetchProductSizes(for productId: Int) async throws -> [SizeDetail] {
-        let productSizesResponse = try await client
-            .from("product_sizes")
-            .select("*")
-            .eq("product_id", value: productId)
-            .execute()
-        
-        let productSizes = try JSONDecoder().decode([MerchandiseItemSize].self, from: productSizesResponse.data)
-        
-        let sizesResponse = try await client
-            .from("sizes")
-            .select("*")
-            .execute()
-        
-        let sizes = try JSONDecoder().decode([MerchandiseSize].self, from: sizesResponse.data)
-        
-        let sizesDict = Dictionary(uniqueKeysWithValues: sizes.map { ($0.id, $0) })
-        
-        var sizeDetails: [SizeDetail] = []
-        
-        for productSize in productSizes {
-            if let size = sizesDict[productSize.size_id] {
-                let sizeType = size.size_type_id == 1 ? "Youth" : "Adult"
-                
-                let detail = SizeDetail(
-                    id: productSize.id,
-                    productId: productId,
-                    sizeName: size.size,
-                    sizeType: sizeType,
-                    price: productSize.price,
-                    stripePriceId: productSize.stripe_price_id,
-                    inStock: true
-                )
-                
-                sizeDetails.append(detail)
-            }
+
+    /// Fetch the RG10 collection products from the public Shopify feed.
+    func fetchProducts() async throws -> [ShopifyProduct] {
+        guard let url = URL(string: StoreConstants.productsJSONURL) else {
+            throw MerchandiseServiceError.invalidURL
         }
-        
-        let sizeOrder = ["small", "medium", "large", "xl", "2xl"]
-        sizeDetails.sort { first, second in
-            if first.sizeType != second.sizeType {
-                return first.sizeType == "Youth"
-            }
-            let firstIndex = sizeOrder.firstIndex(of: first.sizeName.lowercased()) ?? 99
-            let secondIndex = sizeOrder.firstIndex(of: second.sizeName.lowercased()) ?? 99
-            return firstIndex < secondIndex
+
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let httpResponse = response as? HTTPURLResponse,
+           !(200...299).contains(httpResponse.statusCode) {
+            throw MerchandiseServiceError.badResponse
         }
-        
-        return sizeDetails
-    }
-    
-    // MARK: - Fetch Categories
-    func fetchCategories() async throws -> [Category] {
-        let response = try await client
-            .from("categories")
-            .select()
-            .execute()
-        
-        let categories = try JSONDecoder().decode([Category].self, from: response.data)
-        return categories
+
+        let decoded = try JSONDecoder().decode(ShopifyProductsResponse.self, from: data)
+        return decoded.products
     }
 }

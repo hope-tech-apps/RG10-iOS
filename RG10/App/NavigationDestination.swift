@@ -19,8 +19,8 @@ enum NavigationDestination: Hashable {
     // Main Content
     case about
     case staff(selectedIndex: Int?)
+    case tstSpotlight
     case merchandise
-    case merchandiseDetail(Merchandise)
     case termsOfService
     case privacyPolicy
     case videoLibrary

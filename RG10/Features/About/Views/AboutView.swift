@@ -360,7 +360,7 @@ struct TSTSection: View {
                         .font(.system(size: 40, weight: .bold))
                         .foregroundColor(.white)
                     
-                    Text("WE'RE COMING")
+                    Text("WE COMPETED")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white.opacity(0.9))
                         .tracking(2)
@@ -373,7 +373,7 @@ struct TSTSection: View {
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.black)
                 
-                Text("We've officially applied to compete in TST 2026, one of the world's premier 7-v-7 events. This is our chance to showcase RG10 values on a global stage.")
+                Text("We competed at TST 2026, one of the world's premier 7v7 events — taking RG10's values to a global stage.")
                     .font(.system(size: 15))
                     .foregroundColor(.gray)
                     .lineSpacing(4)

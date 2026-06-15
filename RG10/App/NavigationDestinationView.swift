@@ -27,10 +27,10 @@ struct NavigationDestinationView: View {
                 AboutView()
             case .staff(let selectedIndex):
                 StaffView(selectedIndex: selectedIndex)
+            case .tstSpotlight:
+                TSTSpotlightView()
             case .merchandise:
                 MerchandiseView()
-            case .merchandiseDetail(let product):
-                MerchandiseDetailView(product: product)
             case .termsOfService:
                 TermsOfServiceView()
             case .privacyPolicy:
