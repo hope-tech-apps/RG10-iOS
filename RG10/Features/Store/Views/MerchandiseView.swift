@@ -13,13 +13,14 @@ import SwiftUI
 import Combine
 
 /// Wraps a URL so it can drive `sheet(item:)` for the in-app store browser.
-private struct StoreBrowserDestination: Identifiable {
+struct StoreBrowserDestination: Identifiable {
     let url: URL
     var id: String { url.absoluteString }
 }
 
 struct MerchandiseView: View {
     @StateObject private var viewModel = MerchandiseViewModel()
+    @EnvironmentObject private var navigationManager: NavigationManager
     @State private var browserDestination: StoreBrowserDestination?
 
     private let columns = [
@@ -145,6 +146,13 @@ struct MerchandiseView: View {
         .navigationTitle("Team Gear")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                CartButton {
+                    navigationManager.navigate(to: .cart, in: navigationManager.selectedTab)
+                }
+            }
+        }
         .sheet(item: $browserDestination) { destination in
             StoreWebView(
                 url: destination.url,
@@ -160,8 +168,7 @@ struct MerchandiseView: View {
     }
 
     private func openProduct(_ product: ShopifyProduct) {
-        guard let url = product.webURL else { return }
-        browserDestination = StoreBrowserDestination(url: url)
+        navigationManager.navigate(to: .productDetail(product), in: navigationManager.selectedTab)
     }
 }
 

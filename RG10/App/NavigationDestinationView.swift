@@ -31,6 +31,10 @@ struct NavigationDestinationView: View {
                 TSTSpotlightView()
             case .merchandise:
                 MerchandiseView()
+            case .productDetail(let product):
+                ProductDetailView(product: product)
+            case .cart:
+                CartView()
             case .termsOfService:
                 TermsOfServiceView()
             case .privacyPolicy:

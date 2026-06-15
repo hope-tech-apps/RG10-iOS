@@ -17,6 +17,7 @@ struct PasswordResetRequest: Identifiable {
 struct RG10App: App {
     @StateObject private var navigationManager = NavigationManager.shared
     @StateObject private var authManager = AuthManager.shared
+    @StateObject private var cartStore = CartStore.shared
     @State private var showLoading = true
     @State private var showWelcome = false
     @State private var passwordResetRequest: PasswordResetRequest?
@@ -49,6 +50,7 @@ struct RG10App: App {
                     MainTabView()
                         .environmentObject(navigationManager)
                         .environmentObject(authManager)
+                        .environmentObject(cartStore)
                         .trackMemory("MainTabView")
                 }
             }

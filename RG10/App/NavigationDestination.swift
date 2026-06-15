@@ -21,6 +21,8 @@ enum NavigationDestination: Hashable {
     case staff(selectedIndex: Int?)
     case tstSpotlight
     case merchandise
+    case productDetail(ShopifyProduct)
+    case cart
     case termsOfService
     case privacyPolicy
     case videoLibrary
