@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Image performance utilities for photo-heavy screens: downsampled async image loading and a memory monitor.
 - Shared Xcode scheme so the project builds consistently across machines and CI.
 - TST 2026 spotlight on the Home tab linking to a dedicated screen and the team-gear store.
+- Native shopping cart for the store: native product pages with size selection and quantity, an in-app cart with a badge, persisted across launches, and a checkout that hands the full cart to the live Flite Sports checkout. No Shopify account or API token required.
 
 ### Changed
 
