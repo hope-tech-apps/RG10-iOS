@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In-app password reset: recovery emails now deep-link back into the app via `rg10://` and open a reset-password screen, so passwords can be changed without leaving the app.
 - Image performance utilities for photo-heavy screens: downsampled async image loading and a memory monitor.
 - Shared Xcode scheme so the project builds consistently across machines and CI.
+- TST 2026 spotlight on the Home tab linking to a dedicated screen and the team-gear store.
+
+### Changed
+
+- Store now shows the live Flite Sports team-gear collection: products, images, and prices are fetched live from the official store, and tapping a product opens the real storefront in an in-app browser for size selection, cart, and checkout. The previous in-app Stripe merchandise checkout was removed (Stripe still powers training subscriptions and booking payments).
+- "TST 2026" copy updated from upcoming ("we're coming", "applied to compete") to past tense ("we competed at TST 2026").
 
 ### Fixed
 
